@@ -27,6 +27,14 @@ OFSimulator::OFSimulator( QWidget* parent )
 OFSimulator::~OFSimulator()
 {}
 
+void OFSimulator::WorldStart()
+{
+    if( _World == NULLPTR )
+        _World = new QMainWorld( this, ui );
+
+    _World->Init();
+}
+
 void OFSimulator::on_btnNewGame_clicked()
 {
     if( _QProfile == NULLPTR )

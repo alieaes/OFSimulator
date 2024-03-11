@@ -14,8 +14,15 @@ public:
 
     void                                     Init();
 
+public slots:
+    bool                                      eventFilter( QObject* watched, QEvent* event ) override;
+
+protected:
+
 private:
     Ui::OFSimulatorClass                     ui;
+
+    QGraphicsScene*                          _scene;
 
 };
 

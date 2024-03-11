@@ -5,12 +5,13 @@
 
 #include "UI/QMakeProfile.hpp"
 
+#include "OFSimulator.h"
 #include "Base/ExtConfig.hpp"
 
 using namespace Ext;
 
 QMakeProfile::QMakeProfile( QWidget* parent, Ui::OFSimulatorClass _ui )
-    :QWidget( parent )
+    : QWidget( parent )
 {
     ui = _ui;
 
@@ -62,6 +63,9 @@ void QMakeProfile::OnBtnProfileCreateClicked()
     }
 
     auto spCharacter = Module::GetModule< cCharacterModule >( L"CHARACTER" );
+    spCharacter->SetName( ui.edtProfileName->text() );
+
+    qobject_cast< OFSimulator* >( parent() )->WorldStart();
 }
 
 void QMakeProfile::OnBtnProfileCloseClicked()
