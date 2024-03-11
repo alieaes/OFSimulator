@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>qml;cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>qrc;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="Translation Files">
+      <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
+      <Extensions>ts</Extensions>
+    </Filter>
+    <Filter Include="Source Files\UI">
+      <UniqueIdentifier>{21e11f56-fe3d-4495-83b2-ff23f2cddd69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{410ffe55-12a1-4996-a93b-e9b4958af661}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libs">
+      <UniqueIdentifier>{e03ec3e8-c055-4bc8-be61-8f30e799bfeb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libs\Base">
+      <UniqueIdentifier>{10750825-0974-4a4f-92ed-bc9c9e62adf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libs\Util">
+      <UniqueIdentifier>{933dfe24-ec5f-4f03-b78e-17cdec649cf7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libs\String">
+      <UniqueIdentifier>{8d7bd5c6-f005-42d5-a531-1fa6648fafe9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Module">
+      <UniqueIdentifier>{ee6ad0a6-3b41-4a2b-a30d-02070c9f7f09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libs\Module">
+      <UniqueIdentifier>{527cb69f-9b60-4918-8c8e-8308f811a227}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="OFSimulator.qrc">
+      <Filter>Resource Files</Filter>
+    </QtRcc>
+    <QtUic Include="OFSimulator.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtMoc Include="OFSimulator.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <ClCompile Include="OFSimulator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ExLibs\Util\EXUtil.cpp">
+      <Filter>Libs\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\QLoadingPage.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\QMakeProfile.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ExLibs\String\EXString.cpp">
+      <Filter>Libs\String</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\QMainWorld.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Module\cCharacterModule.cpp">
+      <Filter>Module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ExLibs\Module\EXModuleBase.cpp">
+      <Filter>Libs\Module</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ExLibs\Module\EXModuleManager.cpp">
+      <Filter>Libs\Module</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\ExLibs\Base\ExtConfig.hpp">
+      <Filter>Libs\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExLibs\Base\Singleton.hpp">
+      <Filter>Libs\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExLibs\Util\EXUtil.hpp">
+      <Filter>Libs\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="def\OFDefines.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="def\OFCharacter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExLibs\String\EXString.hpp">
+      <Filter>Libs\String</Filter>
+    </ClInclude>
+    <ClInclude Include="def\OFWorlds.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExLibs\Module\EXModuleBase.hpp">
+      <Filter>Libs\Module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExLibs\Module\ExModuleDefines.hpp">
+      <Filter>Libs\Module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExLibs\Module\EXModuleManager.hpp">
+      <Filter>Libs\Module</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="UI\QLoadingPage.hpp">
+      <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="UI\QMakeProfile.hpp">
+      <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="UI\QMainWorld.hpp">
+      <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="Module\cCharacterModule.hpp">
+      <Filter>Module</Filter>
+    </QtMoc>
+  </ItemGroup>
+</Project>

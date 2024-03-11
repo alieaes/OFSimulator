@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/OFSimulator">
+        <file>res/loading.gif</file>
+        <file>res/close.png</file>
+    </qresource>
+</RCC>
