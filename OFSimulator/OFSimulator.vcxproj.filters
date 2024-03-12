@@ -21,9 +21,6 @@
       <UniqueIdentifier>{639EADAA-A684-42e4-A9AD-28FC9BCB8F7C}</UniqueIdentifier>
       <Extensions>ts</Extensions>
     </Filter>
-    <Filter Include="Source Files\UI">
-      <UniqueIdentifier>{21e11f56-fe3d-4495-83b2-ff23f2cddd69}</UniqueIdentifier>
-    </Filter>
     <Filter Include="UI">
       <UniqueIdentifier>{410ffe55-12a1-4996-a93b-e9b4958af661}</UniqueIdentifier>
     </Filter>

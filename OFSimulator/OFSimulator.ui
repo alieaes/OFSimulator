@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1583</width>
+    <width>1588</width>
     <height>978</height>
    </rect>
   </property>
@@ -985,8 +985,14 @@ QPushButton:pressed
                  <widget class="QFrame" name="frame_12">
                   <property name="minimumSize">
                    <size>
-                    <width>50</width>
-                    <height>0</height>
+                    <width>400</width>
+                    <height>600</height>
+                   </size>
+                  </property>
+                  <property name="baseSize">
+                   <size>
+                    <width>1000</width>
+                    <height>600</height>
                    </size>
                   </property>
                   <property name="frameShape">
@@ -1019,8 +1025,8 @@ QPushButton:pressed
                     <widget class="QGraphicsView" name="gvMap">
                      <property name="minimumSize">
                       <size>
-                       <width>50</width>
-                       <height>0</height>
+                       <width>600</width>
+                       <height>600</height>
                       </size>
                      </property>
                     </widget>
@@ -1055,7 +1061,7 @@ QPushButton:pressed
                      <widget class="QFrame" name="frame_14">
                       <property name="minimumSize">
                        <size>
-                        <width>50</width>
+                        <width>200</width>
                         <height>0</height>
                        </size>
                       </property>
@@ -1072,7 +1078,7 @@ QPushButton:pressed
                      <widget class="QFrame" name="frame_15">
                       <property name="minimumSize">
                        <size>
-                        <width>50</width>
+                        <width>200</width>
                         <height>0</height>
                        </size>
                       </property>
