@@ -7,6 +7,13 @@
 
 #include "def/OFWorlds.hpp"
 
+enum eTileAlgorithm
+{
+    OF_TILE_ALGORITHM_V1 = 0,
+    OF_TILE_ALGORITHM_V2 = 1
+};
+
+const int OF_DATA_MAP = 10000;
 
 class QMainWorld : public QWidget
 {
@@ -23,7 +30,13 @@ public slots:
 protected:
 
 private:
-    vec2DTiles                               makeMapTiles( int nX, int nY );
+    vec2DTiles                               makeMapTiles( int nX, int nY, eTileAlgorithm eAlgorithm );
+    void                                     makeMapTilesV1( int nX, int nY, vec2DTiles& vec2DTiles );
+    void                                     makeMapTilesV2( int nX, int nY, vec2DTiles& vec2DTiles );
+
+    QColor                                   getTileColor( eTiles eTile );
+
+    eTiles                                   getRecommendTile( eTiles eTile, QPoint pCurrent, QPoint pMax, int nRandom );
 
 private:
     Ui::OFSimulatorClass                     ui;

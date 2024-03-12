@@ -3,6 +3,7 @@
 #include "UI/QMainWorld.hpp"
 
 #include "Base/ExtConfig.hpp"
+#include "Util/EXUtil.hpp"
 
 QMainWorld::QMainWorld( QWidget* parent, Ui::OFSimulatorClass _ui )
     : QWidget( parent )
@@ -48,7 +49,7 @@ void QMainWorld::Init()
     int nRectYCount = _scene->height() / rect_size;
     int nRectFullCount = nRectXCount * nRectYCount;
 
-    makeMapTiles( nRectXCount, nRectYCount );
+    vec2DTiles vecTiles = makeMapTiles( nRectXCount, nRectYCount, OF_TILE_ALGORITHM_V1 );
 
     int nOffsetX = 0;
 
@@ -58,23 +59,14 @@ void QMainWorld::Init()
         {
             qreal rectX = rect_size * idx;
             qreal rectY = rect_size * idx2;
-            QGraphicsRectItem* rectItem = scene->addRect( rectX, rectY, rect_size, rect_size, QPen( Qt::white ), QBrush( "#ba9568" ) );
+
+            QColor tileColor = getTileColor( vecTiles[ idx ][ idx2 ].eTile );
+
+            QGraphicsRectItem* rectItem = scene->addRect( rectX, rectY, rect_size, rect_size, QPen( Qt::white ), QBrush( tileColor ) );
             rectItem->setParentItem( _pixmap );
+            rectItem->setData( OF_DATA_MAP, OF_DATA_MAP );
         }
     }
-
-    /*// 시계 방향으로 네모를 그리기
-    for( int i = 0; i < 8; ++i )
-    {
-        // 네모를 그리고 Scene에 추가
-        
-        rectItem->setParentItem( _pixmap );
-
-        // 네모를 시계 방향으로 회전시킴
-
-        // 다음 네모의 위치를 계산
-        center_x += rect_size;
-    }*/
 
     //QGraphicsEllipseItem* dot = scene->addEllipse( 0, 0, 5, 5, QPen(), QBrush( Qt::red ) );
     //dot->setPos( 0, 0 ); // Position of the dot
@@ -114,10 +106,9 @@ void QMainWorld::Init()
     */
 }
 
-bool QMainWorld::eventFilter(QObject* watched, QEvent* event)
+bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
 {
     QString objName = watched->objectName();
-    qDebug() << objName;
     QKeyEvent* keyEvent = static_cast< QKeyEvent* >( event );
     QEvent::Type eventType = keyEvent->type();
 
@@ -173,71 +164,37 @@ bool QMainWorld::eventFilter(QObject* watched, QEvent* event)
             _scaleFactor -= scaleFactor;
             qDebug() << "Zoom out" << _scaleFactor;
             _pixmap->setScale( _scaleFactor );
-            //ui.gvMap->scale( 1 / _scaleFactor, 1 / _scaleFactor );
         }
+    }
+    else if( eventType == QEvent::MouseButtonPress )
+    {
+        QMouseEvent* mouseEvent = static_cast< QMouseEvent* >( event );
 
-        /*
-        double scaleFactorDelta = 0.1;
-        int numDegrees = wheelEvent->angleDelta().y() / 8;
-        double numSteps = numDegrees / 15.0; // 15 degrees per step
+        auto mapPoint = _pixmap->mapFromScene( mouseEvent->pos() );
 
-        double scaleFactorMultiplier = 1.0 + numSteps * scaleFactorDelta;
+        QGraphicsItem* item = _scene->itemAt( mapPoint, _pixmap->transform() );
 
-        double dT = scaleFactor * scaleFactorMultiplier;
+        auto pItem = dynamic_cast< QGraphicsRectItem* >( item );
 
-        if( dT > 3.0f )
+        if( pItem != NULLPTR )
         {
-            scaleFactor = 3.0f;
-            return QWidget::eventFilter( watched, event );
+            int a = 0;
+            a = pItem->data( OF_DATA_MAP ).toInt();
         }
-
-        if( dT < 1.0f )
-        {
-            scaleFactor = 1.0f;
-            return QWidget::eventFilter( watched, event );
-        }
-
-        if( scaleFactorMultiplier > 0 )
-        {
-            scaleFactor *= scaleFactorMultiplier;
-            _scene->setSceneRect( _scene->sceneRect().adjusted(
-                - _scene->sceneRect().width() * scaleFactorMultiplier,
-                - _scene->sceneRect().height() * scaleFactorMultiplier,
-                _scene->sceneRect().width() * scaleFactorMultiplier,
-                _scene->sceneRect().height() * scaleFactorMultiplier ) );
-
-            //ui.gvMap->scale( scaleFactorMultiplier, scaleFactorMultiplier );
-        }
-        */
-
-        /*
-        QPointF target_viewport_pos = wheelEvent->position();
-        QPointF target_scene_pos = ui.gvMap->mapToScene( wheelEvent->position().toPoint() );
-        ui.gvMap->setTransformationAnchor( QGraphicsView::AnchorUnderMouse );
-
-        if( wheelEvent->angleDelta().y() > 0 )
-        {
-            ui.gvMap->scale( 1.1, 1.1 );
-        }
-        else
-        {
-            ui.gvMap->scale( 0.9, 0.9 );
-        }
-        */
     }
 
     return QWidget::eventFilter( watched, event );
 }
 
-vec2DTiles QMainWorld::makeMapTiles( int nX, int nY )
+vec2DTiles QMainWorld::makeMapTiles( int nX, int nY, eTileAlgorithm eAlgorithm )
 {
     vec2DTiles vec2DTiles( nX, QVector< stOFTileInfo >( nY, stOFTileInfo() ) );
 
-    QPoint pCenter( nX / 2, nY / 2 );
+    QPoint pCenter( ( int )nX / 2, ( int )nY / 2 );
     QPoint pMax( nX, nY );
     QPoint pMin( 0, 0 );
 
-    qDebug() << "X=" << nX << "|Y=" << nY;
+    qDebug() << "X=" << pCenter.x() << "|Y=" << pCenter.y();
 
     for( auto vecX : vec2DTiles )
     {
@@ -249,19 +206,678 @@ vec2DTiles QMainWorld::makeMapTiles( int nX, int nY )
         qDebug() << s;
     }
 
-    /*
-     * 나중에 옵션으로 넣어도 되고??
-     */
-
-    // Flat -> Grass 변환 확률
-    int nFlatToGrass = 2000;
-
     // 센터는 평지로
-    //vec2DTiles[ pCenter.x() ][ pCenter.y() ] = OF_TILE_FLAT;
-
-    // 센터 상하좌우 채우기
-
+    vec2DTiles[ pCenter.x() ][ pCenter.y() ].eTile = OF_TILE_FLAT;
+    
+    switch( eAlgorithm )
+    {
+        case OF_TILE_ALGORITHM_V1: { makeMapTilesV1( nX, nY, vec2DTiles ); } break;
+        case OF_TILE_ALGORITHM_V2: { makeMapTilesV2( nX, nY, vec2DTiles ); } break;
+        default: { makeMapTilesV1( nX, nY, vec2DTiles ); } break;
+    }
 
     return vec2DTiles;
 }
 
+void QMainWorld::makeMapTilesV1( int nX, int nY, vec2DTiles& vec2DTiles )
+{
+    /*
+     * 1. 중앙 Y라인을 랜덤으로 다 채움 ( FLAT / GRASS / MOUNTAIN )
+     * 2. 그 후 첫 X라인부터 채움
+     */
+
+    QPoint pCenter( nX / 2, nY / 2 );
+    QPoint pMax( nX, nY );
+    QPoint pMin( 0, 0 );
+
+    auto rand = Ext::Util::cRandom< int >( 0, 11000 );
+
+    eTiles Tile = OF_TILE_FLAT;
+
+    for( int idx = pCenter.y(); idx < pMax.y(); idx++ )
+    {
+        if( vec2DTiles[ pCenter.x() ][ idx ].eTile != OF_TILE_NONE )
+            continue;
+
+        Tile = getRecommendTile( OF_TILE_FLAT, QPoint( pCenter.x(), idx ), pMax, rand.Generate() );
+        vec2DTiles[ pCenter.x() ][ idx ].eTile = Tile;
+    }
+
+    for( int idx = 0; idx < pCenter.y(); idx++ )
+    {
+        if( vec2DTiles[ pCenter.x() ][ idx ].eTile != OF_TILE_NONE )
+            continue;
+
+        Tile = getRecommendTile( OF_TILE_FLAT, QPoint( pCenter.x(), idx ), pMax, rand.Generate() );
+        vec2DTiles[ pCenter.x() ][ idx ].eTile = Tile;
+    }
+
+    // X 우측 하단
+    for( int idx = pCenter.x(); idx < pMax.x(); idx++ )
+    {
+        for( int idx2 = pCenter.y(); idx2 < pMax.y(); idx2++ )
+        {
+            if( vec2DTiles[ idx ][ idx2 ].eTile != OF_TILE_NONE )
+            {
+                Tile = vec2DTiles[ idx ][ idx2 ].eTile;
+                continue;
+            }
+
+            Tile = getRecommendTile( Tile, QPoint( idx, idx2 ), pMax, rand.Generate() );
+            vec2DTiles[ idx ][ idx2 ].eTile = Tile;
+        }
+    }
+
+    // X 우측 상단
+    for( int idx = pCenter.x(); idx < pMax.x(); idx++ )
+    {
+        for( int idx2 = 0; idx2 < pCenter.y(); idx2++ )
+        {
+            if( vec2DTiles[ idx ][ idx2 ].eTile != OF_TILE_NONE )
+            {
+                Tile = vec2DTiles[ idx ][ idx2 ].eTile;
+                continue;
+            }
+
+            Tile = getRecommendTile( Tile, QPoint( idx, idx2 ), pMax, rand.Generate() );
+            vec2DTiles[ idx ][ idx2 ].eTile = Tile;
+        }
+    }
+
+    // X 우측 하단
+    for( int idx = 0; idx < pCenter.x(); idx++ )
+    {
+        for( int idx2 = pCenter.y(); idx2 < pMax.y(); idx2++ )
+        {
+            if( vec2DTiles[ idx ][ idx2 ].eTile != OF_TILE_NONE )
+            {
+                Tile = vec2DTiles[ idx ][ idx2 ].eTile;
+                continue;
+            }
+
+            Tile = getRecommendTile( Tile, QPoint( idx, idx2 ), pMax, rand.Generate() );
+            vec2DTiles[ idx ][ idx2 ].eTile = Tile;
+        }
+    }
+
+    // X 우측 상단
+    for( int idx = 0; idx < pCenter.x(); idx++ )
+    {
+        for( int idx2 = 0; idx2 < pCenter.y(); idx2++ )
+        {
+            if( vec2DTiles[ idx ][ idx2 ].eTile != OF_TILE_NONE )
+            {
+                Tile = vec2DTiles[ idx ][ idx2 ].eTile;
+                continue;
+            }
+
+            Tile = getRecommendTile( Tile, QPoint( idx, idx2 ), pMax, rand.Generate() );
+            vec2DTiles[ idx ][ idx2 ].eTile = Tile;
+        }
+    }
+
+}
+
+void QMainWorld::makeMapTilesV2( int nX, int nY, vec2DTiles& vec2DTiles )
+{
+    // 중앙 한 칸부터 확률에 따라 이어가고, 확률에 실패하면 다음 타일을 이어가는 형식
+}
+
+QColor QMainWorld::getTileColor( eTiles eTile )
+{
+    QString sColor;
+
+    switch( eTile )
+    {
+        case OF_TILE_NONE: { sColor = "#000000"; } break;
+        case OF_TILE_FLAT: { sColor = "#c2a17a"; } break;
+        case OF_TILE_GRASS: { sColor = "#8dba68"; } break;
+        case OF_TILE_MOUNTAIN: { sColor = "#679343"; } break;
+        case OF_TILE_CLIFF: { sColor = "#6f593e"; } break;
+        case OF_TILE_COAST: { sColor = "#86a3c7"; } break;
+        case OF_TILE_LAKE: { sColor = "#7596bf"; } break;
+        case OF_TILE_HILLS: { sColor = "#80b256"; } break;
+        case OF_TILE_WOODS: { sColor = "#73a44b"; } break;
+        case OF_TILE_SNOW: { sColor = "#5096e7"; } break;
+        case OF_TILE_VOLCANO: { sColor = "#ba6c68"; } break;
+
+        // 특수 지형이기 때문에 색상 없음
+        case OF_TILE_VILLAGE: { sColor = "#ffffff"; } break;
+        case OF_TILE_CLAN: { sColor = "#ffffff"; } break;
+        case OF_TILE_HOUSE: { sColor = "#ffffff"; } break;
+        default: { sColor = "#ffffff"; }break;
+    }
+
+    QColor color( sColor );
+    return color;
+}
+
+eTiles QMainWorld::getRecommendTile( eTiles eTile, QPoint pCurrent, QPoint pMax, int nRandom )
+{
+    /*
+     * 1. X나 Y가 MAX에 가까울수록 바다가 나올 확률이 높아짐 ( 0~4 / MAX-4~MAX 부터 확률 증가 )
+     * 2. 현재 지형이 산이면 절벽이 생성될 수 있음
+     */
+
+    QPoint pCenter( pMax.x() / 2, pMax.y() / 2 );
+
+    eTiles ret = OF_TILE_NONE;
+    int nPercentage = 0;
+
+    int nMaximumPercent = 11000;
+    int nCurrentLeft = nMaximumPercent;
+    int nCurrent = 0;
+
+    int nLAKE = 0;
+
+    // 바다 확률은 고정
+    if( pCurrent.x() == 0 || pCurrent.y() == 0 )
+        nLAKE = 9000;
+    else if( pCurrent.x() >= 1 && pCurrent.x() <= 4 )
+        nLAKE = 6000 - 1000 * pCurrent.x();
+    else if( pCurrent.y() >= 1 && pCurrent.y() <= 4 )
+        nLAKE = 6000 - 1000 * pCurrent.y();
+    else
+        nLAKE = 1000;
+
+    nCurrentLeft -= nLAKE;
+
+    // 9000 / 1000 = 9 = 0.1%
+    // 9000 / 100 = 90 = 1%
+    // 9000 / 10 = 900 = 10% 
+    int nLeftd = nCurrentLeft / 1000;
+
+    switch( eTile )
+    {
+        case OF_TILE_NONE: {} break;
+        case OF_TILE_FLAT:
+        {
+            /*
+             * FLAT 0.7 / GRASS 0.1 / HILLS 0.1 / WOODS 0.1
+             */
+
+            if( nRandom >= 0 && nRandom <= nLAKE )
+            {
+                ret = OF_TILE_LAKE;
+                break;
+            }
+
+            nCurrent += nLAKE;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 700 )
+            {
+                ret = OF_TILE_FLAT;
+                break;
+            }
+
+            nCurrent += nLeftd * 700;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 200 )
+            {
+                ret = OF_TILE_GRASS;
+                break;
+            }
+
+            nCurrent += nLeftd * 200;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 100 )
+            {
+                ret = OF_TILE_HILLS;
+                break;
+            }
+
+            nCurrent += nLeftd * 100;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 200 )
+            {
+                ret = OF_TILE_WOODS;
+                break;
+            }
+
+            ret = OF_TILE_FLAT;
+        } break;
+        case OF_TILE_GRASS:
+        {
+            /*
+             * GRASS 0.4 / FLAT 0.2 / HILLS 0.1 / COAST 0.1 / WOODS 0.2
+             */
+
+            if( nRandom >= 0 && nRandom <= nLAKE )
+            {
+                ret = OF_TILE_LAKE;
+                break;
+            }
+
+            nCurrent += nLAKE;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 400 )
+            {
+                ret = OF_TILE_GRASS;
+                break;
+            }
+
+            nCurrent += nLeftd * 400;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 200 )
+            {
+                ret = OF_TILE_FLAT;
+                break;
+            }
+
+            nCurrent += nLeftd * 200;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 100 )
+            {
+                ret = OF_TILE_HILLS;
+                break;
+            }
+
+            nCurrent += nLeftd * 100;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 100 )
+            {
+                ret = OF_TILE_COAST;
+                break;
+            }
+
+            nCurrent += nLeftd * 100;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 200 )
+            {
+                ret = OF_TILE_WOODS;
+                break;
+            }
+
+            ret = OF_TILE_FLAT;
+        } break;
+        case OF_TILE_MOUNTAIN:
+        {
+            /*
+             * MOUNTAIN 0.4 / HILLS 0.2 / CLIFF 0.1 / SNOW 0.05 / VOLCANO 0.05 / GRASS 0.1 / FLAT 0.1
+             */
+
+            if( nRandom >= 0 && nRandom <= nLAKE )
+            {
+                ret = OF_TILE_LAKE;
+                break;
+            }
+
+            nCurrent += nLAKE;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 400 )
+            {
+                ret = OF_TILE_MOUNTAIN;
+                break;
+            }
+
+            nCurrent += nLeftd * 400;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 200 )
+            {
+                ret = OF_TILE_HILLS;
+                break;
+            }
+
+            nCurrent += nLeftd * 200;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 100 )
+            {
+                ret = OF_TILE_CLIFF;
+                break;
+            }
+
+            nCurrent += nLeftd * 100;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 50 )
+            {
+                ret = OF_TILE_SNOW;
+                break;
+            }
+
+            nCurrent += nLeftd * 50;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 50 )
+            {
+                ret = OF_TILE_VOLCANO;
+                break;
+            }
+
+            nCurrent += nLeftd * 50;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 100 )
+            {
+                ret = OF_TILE_GRASS;
+                break;
+            }
+
+            nCurrent += nLeftd * 100;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 100 )
+            {
+                ret = OF_TILE_FLAT;
+                break;
+            }
+
+            ret = OF_TILE_MOUNTAIN;
+
+        } break;
+        case OF_TILE_CLIFF:
+        {
+            /*
+             * MOUNTAIN 0.4 / CLIFF 0.4 / HILLS 0.1 / VOLCANO 0.1
+             */
+
+            if( nRandom >= 0 && nRandom <= nLAKE )
+            {
+                ret = OF_TILE_LAKE;
+                break;
+            }
+
+            nCurrent += nLAKE;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 400 )
+            {
+                ret = OF_TILE_MOUNTAIN;
+                break;
+            }
+
+            nCurrent += nLeftd * 400;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 400 )
+            {
+                ret = OF_TILE_CLIFF;
+                break;
+            }
+
+            nCurrent += nLeftd * 400;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 100 )
+            {
+                ret = OF_TILE_HILLS;
+                break;
+            }
+
+            nCurrent += nLeftd * 100;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 100 )
+            {
+                ret = OF_TILE_VOLCANO;
+                break;
+            }
+
+            ret = OF_TILE_CLIFF;
+
+        } break;
+        case OF_TILE_COAST:
+        {
+            /*
+             * COAST 0.1 / FLAT 0.4 / GRASS 0.45 / SNOW 0.05
+             */
+
+            if( nRandom >= 0 && nRandom <= nLAKE )
+            {
+                ret = OF_TILE_LAKE;
+                break;
+            }
+
+            nCurrent += nLAKE;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 100 )
+            {
+                ret = OF_TILE_COAST;
+                break;
+            }
+
+            nCurrent += nLeftd * 100;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 300 )
+            {
+                ret = OF_TILE_FLAT;
+                break;
+            }
+
+            nCurrent += nLeftd * 300;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 450 )
+            {
+                ret = OF_TILE_GRASS;
+                break;
+            }
+
+            nCurrent += nLeftd * 450;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 50 )
+            {
+                ret = OF_TILE_SNOW;
+                break;
+            }
+
+            ret = OF_TILE_COAST;
+
+        } break;
+        case OF_TILE_LAKE:
+        {
+            /*
+             * 어차피 LAKE 확률은 위에서 보정하기 때문에, 적게 넣도록 함
+             * COAST 0.2 / FLAT 0.5 / GRASS 0.25 / SNOW 0.05
+             */
+
+            if( nRandom >= 0 && nRandom <= nLAKE )
+            {
+                ret = OF_TILE_LAKE;
+                break;
+            }
+
+            nCurrent += nLAKE;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 200 )
+            {
+                ret = OF_TILE_COAST;
+                break;
+            }
+
+            nCurrent += nLeftd * 200;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 500 )
+            {
+                ret = OF_TILE_FLAT;
+                break;
+            }
+
+            nCurrent += nLeftd * 500;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 250 )
+            {
+                ret = OF_TILE_GRASS;
+                break;
+            }
+
+            nCurrent += nLeftd * 250;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 50 )
+            {
+                ret = OF_TILE_SNOW;
+                break;
+            }
+
+            ret = OF_TILE_LAKE;
+
+        } break;
+        case OF_TILE_HILLS:
+        {
+            /*
+             * HILLS 0.4 / MOUNTAIN 0.2 / WOODS 0.2 / GRASS 0.15 / VOLCANO 0.05
+             */
+
+            if( nRandom >= 0 && nRandom <= nLAKE )
+            {
+                ret = OF_TILE_LAKE;
+                break;
+            }
+
+            nCurrent += nLAKE;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 400 )
+            {
+                ret = OF_TILE_HILLS;
+                break;
+            }
+
+            nCurrent += nLeftd * 400;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 200 )
+            {
+                ret = OF_TILE_MOUNTAIN;
+                break;
+            }
+
+            nCurrent += nLeftd * 200;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 200 )
+            {
+                ret = OF_TILE_WOODS;
+                break;
+            }
+
+            nCurrent += nLeftd * 200;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 150 )
+            {
+                ret = OF_TILE_GRASS;
+                break;
+            }
+
+            nCurrent += nLeftd * 150;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 50 )
+            {
+                ret = OF_TILE_VOLCANO;
+                break;
+            }
+
+            ret = OF_TILE_HILLS;
+        } break;
+        case OF_TILE_WOODS:
+        {
+            /*
+             * WOODS 0.4 / GRASS 0.3 / MOUNTAIN 0.2 / FLAT 0.1
+             */
+
+            if( nRandom >= 0 && nRandom <= nLAKE )
+            {
+                ret = OF_TILE_LAKE;
+                break;
+            }
+
+            nCurrent += nLAKE;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 400 )
+            {
+                ret = OF_TILE_WOODS;
+                break;
+            }
+
+            nCurrent += nLeftd * 400;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 300 )
+            {
+                ret = OF_TILE_GRASS;
+                break;
+            }
+
+            nCurrent += nLeftd * 300;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 200 )
+            {
+                ret = OF_TILE_MOUNTAIN;
+                break;
+            }
+
+            nCurrent += nLeftd * 200;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 100 )
+            {
+                ret = OF_TILE_FLAT;
+                break;
+            }
+
+            ret = OF_TILE_WOODS;
+
+        } break;
+        case OF_TILE_SNOW:
+            {
+            /*
+             * SNOW 0.1 / COAST 0.1 / MOUNTAIN 0.4 / FLAT 0.4
+             */
+
+            if( nRandom >= 0 && nRandom <= nLAKE )
+            {
+                ret = OF_TILE_LAKE;
+                break;
+            }
+
+            nCurrent += nLAKE;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 100 )
+            {
+                ret = OF_TILE_SNOW;
+                break;
+            }
+
+            nCurrent += nLeftd * 100;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 100 )
+            {
+                ret = OF_TILE_COAST;
+                break;
+            }
+
+            nCurrent += nLeftd * 100;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 400 )
+            {
+                ret = OF_TILE_MOUNTAIN;
+                break;
+            }
+
+            nCurrent += nLeftd * 400;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 400 )
+            {
+                ret = OF_TILE_FLAT;
+                break;
+            }
+
+            ret = OF_TILE_SNOW;
+            } break;
+        case OF_TILE_VOLCANO:
+            {
+
+            /*
+             * VOLCANO 0.3 / MOUNTAIN 0.2 / FLAT 0.3 / HILLS 0.2
+             */
+
+            if( nRandom >= 0 && nRandom <= nLAKE )
+            {
+                ret = OF_TILE_LAKE;
+                break;
+            }
+
+            nCurrent += nLAKE;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 300 )
+            {
+                ret = OF_TILE_VOLCANO;
+                break;
+            }
+
+            nCurrent += nLeftd * 300;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 200 )
+            {
+                ret = OF_TILE_MOUNTAIN;
+                break;
+            }
+
+            nCurrent += nLeftd * 200;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 300 )
+            {
+                ret = OF_TILE_FLAT;
+                break;
+            }
+
+            nCurrent += nLeftd * 300;
+            if( nRandom > nCurrent && nRandom <= nCurrent + nLeftd * 300 )
+            {
+                ret = OF_TILE_HILLS;
+                break;
+            }
+
+            ret = OF_TILE_VOLCANO;
+        } break;
+        case OF_TILE_VILLAGE: {} break;
+        case OF_TILE_CLAN: {} break;
+        case OF_TILE_HOUSE: {} break;
+        default: {} break;
+    }
+
+    return ret;
+}
+
+/*
+    switch( eTile )
+    {
+        case OF_TILE_NONE: {} break;
+        case OF_TILE_FLAT: {} break;
+        case OF_TILE_GRASS: {} break;
+        case OF_TILE_MOUNTAIN: {} break;
+        case OF_TILE_CLIFF: {} break;
+        case OF_TILE_COAST: {} break;
+        case OF_TILE_LAKE: {} break;
+        case OF_TILE_HILLS: {} break;
+        case OF_TILE_WOODS: {} break;
+        case OF_TILE_SNOW: {} break;
+        case OF_TILE_VOLCANO: {} break;
+        case OF_TILE_VILLAGE: {} break;
+        case OF_TILE_CLAN: {} break;
+        case OF_TILE_HOUSE: {} break;
+        default: {} break;
+    }
+ */
