@@ -33,7 +33,7 @@ void QMainWorld::Init()
     ui.gvMap->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     ui.gvMap->setViewportUpdateMode( QGraphicsView::BoundingRectViewportUpdate );
     ui.gvMap->setCacheMode( QGraphicsView::CacheBackground );
-    ui.gvMap->setDragMode( QGraphicsView::ScrollHandDrag );
+    //ui.gvMap->setDragMode( QGraphicsView::ScrollHandDrag );
 
     _scaleFactor = 1.0f;
 
@@ -65,7 +65,9 @@ void QMainWorld::Init()
 
             QGraphicsRectItem* rectItem = scene->addRect( rectX, rectY, rect_size, rect_size, QPen( Qt::white ), QBrush( tileColor ) );
             rectItem->setParentItem( _pixmap );
-            rectItem->setData( OF_DATA_MAP, OF_DATA_MAP );
+
+            if( vecTiles[ idx ][ idx2 ].eObject == OF_OBJECT_VILLAGE )
+                rectItem->setData( OF_DATA_OBJECT, OF_OBJECT_VILLAGE );
 
             QPixmap pix( 32, 32 );
             pix.load( ":/OFSimulator/res/village.png" );
@@ -145,6 +147,22 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
             case Qt::Key_Down:
             _pixmap->moveBy( 0, -50 );
             break;
+            case Qt::Key_Control:
+            ui.gvMap->setDragMode( QGraphicsView::ScrollHandDrag );
+            break;
+            default:
+            break;
+        }
+    }
+    else if( eventType == QEvent::KeyRelease )
+    {
+        QKeyEvent* keyEvent = static_cast< QKeyEvent* >( event );
+
+        switch( keyEvent->key() )
+        {
+            case Qt::Key_Control:
+            ui.gvMap->setDragMode( QGraphicsView::NoDrag );
+            break;
             default:
             break;
         }
@@ -185,20 +203,19 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
     {
         QMouseEvent* mouseEvent = static_cast< QMouseEvent* >( event );
 
-        if( mouseEvent->button() == Qt::RightButton )
+        if( mouseEvent->button() == Qt::LeftButton )
         {
-            
-        }
-        auto mapPoint = _pixmap->mapFromScene( mouseEvent->pos() );
+            auto mapPoint = _pixmap->mapFromScene( mouseEvent->pos() );
 
-        QGraphicsItem* item = _scene->itemAt( mapPoint, _pixmap->transform() );
+            QGraphicsItem* item = _scene->itemAt( mapPoint, _pixmap->transform() );
 
-        auto pItem = dynamic_cast< QGraphicsRectItem* >( item );
+            auto pItem = dynamic_cast< QGraphicsRectItem* >( item );
 
-        if( pItem != NULLPTR )
-        {
-            int a = 0;
-            a = pItem->data( OF_DATA_MAP ).toInt();
+            if( pItem != NULLPTR )
+            {
+                int a = 0;
+                //a = pItem->data( OF_DATA_MAP ).toInt();
+            }
         }
     }
 
@@ -340,6 +357,22 @@ void QMainWorld::makeMapTilesV1( int nX, int nY, vec2DTiles& vec2DTiles )
 void QMainWorld::makeMapTilesV2( int nX, int nY, vec2DTiles& vec2DTiles )
 {
     // 중앙 한 칸부터 확률에 따라 이어가고, 확률에 실패하면 다음 타일을 이어가는 형식
+}
+
+void QMainWorld::makeObject( vec2DTiles& vec2DTiles )
+{
+    int nTotalCount = 0;
+
+    for( auto vecX : vec2DTiles )
+    {
+        for( auto vecY : vecX )
+        {
+            nTotalCount++;
+        }
+    }
+
+    // 마을 개수
+    int nVillageMin;
 }
 
 QColor QMainWorld::getTileColor( eTiles eTile )

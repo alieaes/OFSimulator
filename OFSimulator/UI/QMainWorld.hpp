@@ -13,7 +13,7 @@ enum eTileAlgorithm
     OF_TILE_ALGORITHM_V2 = 1
 };
 
-const int OF_DATA_MAP = 10000;
+const int OF_DATA_OBJECT  = 10000;
 
 class QMainWorld : public QWidget
 {
@@ -45,6 +45,8 @@ private:
     QGraphicsPixmapItem*                     _pixmap;
     double                                   _scaleFactor;
     int                                      _moveSpeed;
+
+    QPoint                                   _pLastPos;
 };
 
 #endif
