@@ -39,3 +39,5 @@
 *.lik
 *.ilk
 *.exp
+
+_ReSharper.Caches/
