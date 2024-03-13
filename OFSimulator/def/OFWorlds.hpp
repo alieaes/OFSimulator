@@ -22,15 +22,26 @@ enum eTiles
     OF_TILE_WOODS = 128,
     OF_TILE_SNOW = 256,
     OF_TILE_VOLCANO = 512,
+};
 
-    OF_TILE_VILLAGE = 1024,
-    OF_TILE_CLAN = 2048,
-    OF_TILE_HOUSE = 4096
+enum eOFObject
+{
+    OF_OBJECT_NONE    = 0,
+
+    // 마을
+    OF_OBJECT_VILLAGE = 1,
+
+    // 문파
+    OF_OBJECT_CLAN    = 2,
+
+    // 기연을 위한?
+    OF_TITLE_HOUSE    = 3
 };
 
 struct stOFTileInfo
 {
     eTiles                     eTile              = OF_TILE_NONE;
+    eOFObject                  eObject            = OF_OBJECT_NONE;
 
     QPoint                     pCoord             = QPoint( 0, 0 );
 

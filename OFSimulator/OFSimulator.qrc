@@ -2,5 +2,7 @@
     <qresource prefix="/OFSimulator">
         <file>res/loading.gif</file>
         <file>res/close.png</file>
+        <file>res/house.png</file>
+        <file>res/village.png</file>
     </qresource>
 </RCC>

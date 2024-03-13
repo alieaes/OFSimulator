@@ -22,7 +22,7 @@ void QMainWorld::Init()
     ui.ControlCentor->setCurrentIndex( 3 );
 
     QGraphicsScene* scene = new QGraphicsScene( this );
-    scene->setSceneRect( 0, 0, ui.gvMap->width() * 2, ui.gvMap->height() * 2 );
+    scene->setSceneRect( 0, 0, ui.gvMap->width() * 3, ui.gvMap->height() * 3 );
     _scene = scene;
 
     ui.gvMap->setBackgroundBrush( QBrush( "#302f2b" ) );
@@ -33,6 +33,7 @@ void QMainWorld::Init()
     ui.gvMap->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     ui.gvMap->setViewportUpdateMode( QGraphicsView::BoundingRectViewportUpdate );
     ui.gvMap->setCacheMode( QGraphicsView::CacheBackground );
+    ui.gvMap->setDragMode( QGraphicsView::ScrollHandDrag );
 
     _scaleFactor = 1.0f;
 
@@ -41,7 +42,7 @@ void QMainWorld::Init()
     _pixmap = scene->addPixmap( pix );
     _pixmap->setPos( 0, 0 );
 
-    qreal rect_size = 50; // 네모의 크기
+    qreal rect_size = 60; // 네모의 크기
 
     qDebug() << "width=" << _scene->width() << "|height=" << _scene->height();
 
@@ -65,6 +66,16 @@ void QMainWorld::Init()
             QGraphicsRectItem* rectItem = scene->addRect( rectX, rectY, rect_size, rect_size, QPen( Qt::white ), QBrush( tileColor ) );
             rectItem->setParentItem( _pixmap );
             rectItem->setData( OF_DATA_MAP, OF_DATA_MAP );
+
+            QPixmap pix( 32, 32 );
+            pix.load( ":/OFSimulator/res/village.png" );
+            //pix.load( ":/OFSimulator/res/house.png" );
+
+            QGraphicsPixmapItem* village = scene->addPixmap( pix );
+            village->setScale( 0.5 );
+            village->setPos( rectX + rect_size / 2 - pix.width() / 4 , rectY + rect_size / 2 - pix.height() / 4 );
+            village->setParentItem( rectItem );
+            village->setZValue( 10 );
         }
     }
 
@@ -150,26 +161,34 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
         if( wheelEvent->angleDelta().y() > 0 )
         {
             if( dT >= 3.0f )
-                return QWidget::eventFilter( watched, event );
+                return false;
 
             _scaleFactor += scaleFactor;
             qDebug() << "Zoom in" << _scaleFactor;
             _pixmap->setScale( _scaleFactor );
+
+            return false;
         }
         else
         {
             if( dT <= 1.0f )
-                return QWidget::eventFilter( watched, event );
+                return false;
 
             _scaleFactor -= scaleFactor;
             qDebug() << "Zoom out" << _scaleFactor;
             _pixmap->setScale( _scaleFactor );
+
+            return false;
         }
     }
     else if( eventType == QEvent::MouseButtonPress )
     {
         QMouseEvent* mouseEvent = static_cast< QMouseEvent* >( event );
 
+        if( mouseEvent->button() == Qt::RightButton )
+        {
+            
+        }
         auto mapPoint = _pixmap->mapFromScene( mouseEvent->pos() );
 
         QGraphicsItem* item = _scene->itemAt( mapPoint, _pixmap->transform() );
@@ -340,11 +359,6 @@ QColor QMainWorld::getTileColor( eTiles eTile )
         case OF_TILE_WOODS: { sColor = "#73a44b"; } break;
         case OF_TILE_SNOW: { sColor = "#5096e7"; } break;
         case OF_TILE_VOLCANO: { sColor = "#ba6c68"; } break;
-
-        // 특수 지형이기 때문에 색상 없음
-        case OF_TILE_VILLAGE: { sColor = "#ffffff"; } break;
-        case OF_TILE_CLAN: { sColor = "#ffffff"; } break;
-        case OF_TILE_HOUSE: { sColor = "#ffffff"; } break;
         default: { sColor = "#ffffff"; }break;
     }
 
@@ -852,9 +866,6 @@ eTiles QMainWorld::getRecommendTile( eTiles eTile, QPoint pCurrent, QPoint pMax,
 
             ret = OF_TILE_VOLCANO;
         } break;
-        case OF_TILE_VILLAGE: {} break;
-        case OF_TILE_CLAN: {} break;
-        case OF_TILE_HOUSE: {} break;
         default: {} break;
     }
 
