@@ -33,7 +33,8 @@ void QMainWorld::Init()
     ui.gvMap->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     ui.gvMap->setViewportUpdateMode( QGraphicsView::BoundingRectViewportUpdate );
     ui.gvMap->setCacheMode( QGraphicsView::CacheBackground );
-    //ui.gvMap->setDragMode( QGraphicsView::ScrollHandDrag );
+    ui.gvMap->setViewportUpdateMode( QGraphicsView::SmartViewportUpdate );
+    ui.gvMap->setRenderHint( QPainter::Antialiasing );
 
     _scaleFactor = 1.0f;
 
@@ -41,6 +42,7 @@ void QMainWorld::Init()
     pix.fill( QColor( "#1e1e1e" ) );
     _pixmap = scene->addPixmap( pix );
     _pixmap->setPos( 0, 0 );
+    _scene->installEventFilter( this );
 
     qreal rect_size = 60; // 네모의 크기
 
@@ -92,6 +94,17 @@ void QMainWorld::Init()
                 village->setParentItem( rectItem );
                 village->setZValue( 10 );
             }
+            else if( _vecTiles[ idx ][ idx2 ].eObject == OF_OBJECT_CLAN )
+            {
+                QPixmap pix( 32, 32 );
+                pix.load( ":/OFSimulator/res/banner.png" );
+
+                QGraphicsPixmapItem* village = scene->addPixmap( pix );
+                village->setScale( 0.5 );
+                village->setPos( rectX + rect_size / 2 - pix.width() / 4, rectY + rect_size / 2 - pix.height() / 4 );
+                village->setParentItem( rectItem );
+                village->setZValue( 10 );
+            }
         }
     }
 
@@ -118,9 +131,7 @@ void QMainWorld::Init()
     ui.gvMap->setScene( scene );
 
     ui.gvMap->setViewportUpdateMode( QGraphicsView::BoundingRectViewportUpdate );
-    ui.gvMap->setRenderHint( QPainter::Antialiasing );
-    ui.gvMap->setCacheMode( QGraphicsView::CacheBackground );
-    ui.gvMap->setViewportUpdateMode( QGraphicsView::SmartViewportUpdate );
+
 
     ui.gvMap->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     ui.gvMap->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
@@ -131,6 +142,25 @@ void QMainWorld::Init()
     ui.gvMap->viewport()->setMouseTracking( true );
     ui.gvMap->viewport()->installEventFilter( this );
     */
+}
+
+QSize QMainWorld::GetPixmapSize()
+{
+    QSize size( 0, 0 );
+    if( _pixmap != NULLPTR )
+        size = _pixmap->pixmap().size();
+
+    return size;
+}
+
+QGraphicsPixmapItem* QMainWorld::GetPixmap()
+{
+    return _pixmap;
+}
+
+QGraphicsScene* QMainWorld::GetScene()
+{
+    return _scene;
 }
 
 bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
@@ -145,24 +175,29 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
 
         switch( keyEvent->key() )
         {
+            /*
             case Qt::Key_Left:
             case Qt::Key_A:
-            _pixmap->moveBy( 50, 0 );
+            _pixmap->moveBy( 100, 0 );
             break;
             case Qt::Key_D:
             case Qt::Key_Right:
-            _pixmap->moveBy( -50, 0 );
+            _pixmap->moveBy( -100, 0 );
             break;
             case Qt::Key_W:
             case Qt::Key_Up:
-            _pixmap->moveBy( 0, 50 );
+            _pixmap->moveBy( 0, 100 );
             break;
             case Qt::Key_S:
             case Qt::Key_Down:
-            _pixmap->moveBy( 0, -50 );
+            _pixmap->moveBy( 0, -100 );
             break;
+            */
             case Qt::Key_Control:
-            ui.gvMap->setDragMode( QGraphicsView::ScrollHandDrag );
+                {
+                ui.gvMap->setTransformationAnchor( QGraphicsView::AnchorUnderMouse );
+                ui.gvMap->setDragMode( QGraphicsView::ScrollHandDrag );
+                }
             break;
             default:
             break;
@@ -213,12 +248,23 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
             return false;
         }
     }
+    else if( eventType == QEvent::MouseMove )
+    {
+        QMouseEvent* mouseEvent = static_cast< QMouseEvent* >( event );
+        qDebug() << "MOVE";
+
+        if( mouseEvent->buttons() == Qt::LeftButton )
+        {
+        }
+    }
     else if( eventType == QEvent::MouseButtonPress )
     {
         QMouseEvent* mouseEvent = static_cast< QMouseEvent* >( event );
 
         if( mouseEvent->button() == Qt::LeftButton )
         {
+            qDebug() << "LeftButton clicked";
+
             auto mapPoint = _pixmap->mapFromScene( mouseEvent->pos() );
 
             QGraphicsItem* item = _scene->itemAt( mapPoint, _pixmap->transform() );
@@ -232,6 +278,7 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
             }
         }
     }
+
 
     return QWidget::eventFilter( watched, event );
 }
@@ -442,7 +489,7 @@ void QMainWorld::makeObjectImpl( vec2DTiles& vec2DTiles, eOFObject eObject, int 
     int nRemainCnt = 0;
     int nMaxX = 0;
 
-    Ext::Util::cRandom< int > cRandomObject = Ext::Util::cRandom< int >( 0, 1000 );
+    Ext::Util::cRandom< int > cRandomObject = Ext::Util::cRandom< int >( 0, 10000 );
 
     for( auto vecX : vec2DTiles )
     {
@@ -450,8 +497,8 @@ void QMainWorld::makeObjectImpl( vec2DTiles& vec2DTiles, eOFObject eObject, int 
 
         nMaxX = vecX.count();
 
-        Ext::Util::cRandom< int > cRandomY = Ext::Util::cRandom< int >( 0, vecX.count() );
-        Ext::Util::cRandom< int > cRandomX = Ext::Util::cRandom< int >( 0, vec2DTiles.count() );
+        Ext::Util::cRandom< int > cRandomY = Ext::Util::cRandom< int >( 0, ( vecX.count() - 1 ) );
+        Ext::Util::cRandom< int > cRandomX = Ext::Util::cRandom< int >( 0, ( vec2DTiles.count() - 1 ) );
 
         // 3회만 랜덤하도록 함. 안 되면 Remain으로 남김
         for( int idx = 0; idx < 3; idx++ )
@@ -473,7 +520,7 @@ void QMainWorld::makeObjectImpl( vec2DTiles& vec2DTiles, eOFObject eObject, int 
 
             if( cRandomObject.Generate() >= nCompare )
             {
-                item.eObject = OF_OBJECT_VILLAGE;
+                item.eObject = eObject;
                 nInstallCnt--;
             }
             else
@@ -485,8 +532,8 @@ void QMainWorld::makeObjectImpl( vec2DTiles& vec2DTiles, eOFObject eObject, int 
 
     int nXRandom = vec2DTiles.count();
 
-    Ext::Util::cRandom< int > cRandomY = Ext::Util::cRandom< int >( 0, nMaxX );
-    Ext::Util::cRandom< int > cRandomX = Ext::Util::cRandom< int >( 0, vec2DTiles.count() );
+    Ext::Util::cRandom< int > cRandomY = Ext::Util::cRandom< int >( 0, ( nMaxX - 1 ) );
+    Ext::Util::cRandom< int > cRandomX = Ext::Util::cRandom< int >( 0, ( vec2DTiles.count() - 1 ) );
 
     while( nRemainCnt > 0 )
     {
@@ -515,39 +562,39 @@ int QMainWorld::getObjectPercentage( eOFObject eObject, eTiles eTile )
     if( eObject == OF_OBJECT_VILLAGE )
     {
         if( eTile == OF_TILE_COAST || eTile == OF_TILE_LAKE )
-            nCompare -= 800;
+            nCompare -= 8000;
         else if( eTile == OF_TILE_SNOW || eTile == OF_TILE_VOLCANO )
-            nCompare -= 900;
+            nCompare -= 9000;
         else if( eTile == OF_TILE_CLIFF )
-            nCompare -= 950;
+            nCompare -= 9500;
         else if( eTile == OF_TILE_MOUNTAIN )
-            nCompare -= 600;
+            nCompare -= 6000;
         else
-            nCompare -= 300;
+            nCompare -= 3000;
     }
     else if( eObject == OF_OBJECT_HOUSE )
     {
         if( eTile == OF_TILE_COAST || eTile == OF_TILE_LAKE )
-            nCompare -= 1000;
+            nCompare -= 10000;
         else if( eTile == OF_TILE_SNOW || eTile == OF_TILE_VOLCANO )
-            nCompare -= 900;
+            nCompare -= 9000;
         else if( eTile == OF_TILE_CLIFF )
-            nCompare -= 800;
+            nCompare -= 8000;
         else if( eTile == OF_TILE_MOUNTAIN )
-            nCompare -= 500;
+            nCompare -= 5000;
         else
-            nCompare -= 300;
+            nCompare -= 3000;
     }
     else if( eObject == OF_OBJECT_CLAN )
     {
         if( eTile == OF_TILE_COAST || eTile == OF_TILE_LAKE )
-            nCompare -= 500;
+            nCompare -= 5000;
         else if( eTile == OF_TILE_SNOW || eTile == OF_TILE_VOLCANO )
-            nCompare -= 600;
+            nCompare -= 6000;
         else if( eTile == OF_TILE_CLIFF )
-            nCompare -= 900;
+            nCompare -= 9000;
         else
-            nCompare -= 300;
+            nCompare -= 3000;
     }
 
     return nCompare;

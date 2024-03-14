@@ -16,14 +16,14 @@ enum eTileAlgorithm
 const int OF_DATA_TILE_INFO    = 10000;
 const int OF_DATA_OBJECT       = 10001;
 
-const int OF_VILLAGE_MIN       = 80;
-const int OF_VILLAGE_MAX       = 100;
+const int OF_VILLAGE_MIN       = 100;
+const int OF_VILLAGE_MAX       = 80;
 
-const int OF_HOUSE_MIN         = 300;
-const int OF_HOUSE_MAX         = 400;
+const int OF_HOUSE_MIN         = 400;
+const int OF_HOUSE_MAX         = 300;
 
-const int OF_CLAN_MIN          = 100;
-const int OF_CLAN_MAX          = 150;
+const int OF_CLAN_MIN          = 150;
+const int OF_CLAN_MAX          = 100;
 
 class QMainWorld : public QWidget
 {
@@ -33,6 +33,10 @@ public:
     ~QMainWorld();
 
     void                                     Init();
+
+    QSize                                    GetPixmapSize();
+    QGraphicsPixmapItem*                     GetPixmap();
+    QGraphicsScene*                          GetScene();
 
 public slots:
     bool                                     eventFilter( QObject* watched, QEvent* event ) override;

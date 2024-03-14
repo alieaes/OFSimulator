@@ -4,5 +4,6 @@
         <file>res/close.png</file>
         <file>res/house.png</file>
         <file>res/village.png</file>
+        <file>res/banner.png</file>
     </qresource>
 </RCC>
