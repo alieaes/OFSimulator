@@ -50,7 +50,7 @@ void QMainWorld::Init()
     int nRectYCount = _scene->height() / rect_size;
     int nRectFullCount = nRectXCount * nRectYCount;
 
-    vec2DTiles vecTiles = makeMapTiles( nRectXCount, nRectYCount, OF_TILE_ALGORITHM_V1 );
+    _vecTiles = makeMapTiles( nRectXCount, nRectYCount, OF_TILE_ALGORITHM_V1 );
 
     int nOffsetX = 0;
 
@@ -61,23 +61,37 @@ void QMainWorld::Init()
             qreal rectX = rect_size * idx;
             qreal rectY = rect_size * idx2;
 
-            QColor tileColor = getTileColor( vecTiles[ idx ][ idx2 ].eTile );
+            QColor tileColor = getTileColor( _vecTiles[ idx ][ idx2 ].eTile );
 
             QGraphicsRectItem* rectItem = scene->addRect( rectX, rectY, rect_size, rect_size, QPen( Qt::white ), QBrush( tileColor ) );
             rectItem->setParentItem( _pixmap );
 
-            if( vecTiles[ idx ][ idx2 ].eObject == OF_OBJECT_VILLAGE )
-                rectItem->setData( OF_DATA_OBJECT, OF_OBJECT_VILLAGE );
+            QVariant var;
+            var.setValue( _vecTiles[ idx ][ idx2 ] );
+            rectItem->setData( OF_DATA_TILE_INFO, var );
 
-            QPixmap pix( 32, 32 );
-            pix.load( ":/OFSimulator/res/village.png" );
-            //pix.load( ":/OFSimulator/res/house.png" );
+            if( _vecTiles[ idx ][ idx2 ].eObject == OF_OBJECT_VILLAGE )
+            {
+                QPixmap pix( 32, 32 );
+                pix.load( ":/OFSimulator/res/village.png" );
 
-            QGraphicsPixmapItem* village = scene->addPixmap( pix );
-            village->setScale( 0.5 );
-            village->setPos( rectX + rect_size / 2 - pix.width() / 4 , rectY + rect_size / 2 - pix.height() / 4 );
-            village->setParentItem( rectItem );
-            village->setZValue( 10 );
+                QGraphicsPixmapItem* village = scene->addPixmap( pix );
+                village->setScale( 0.5 );
+                village->setPos( rectX + rect_size / 2 - pix.width() / 4, rectY + rect_size / 2 - pix.height() / 4 );
+                village->setParentItem( rectItem );
+                village->setZValue( 10 );
+            }
+            else if( _vecTiles[ idx ][ idx2 ].eObject == OF_OBJECT_HOUSE )
+            {
+                QPixmap pix( 32, 32 );
+                pix.load( ":/OFSimulator/res/house.png" );
+
+                QGraphicsPixmapItem* village = scene->addPixmap( pix );
+                village->setScale( 0.5 );
+                village->setPos( rectX + rect_size / 2 - pix.width() / 4, rectY + rect_size / 2 - pix.height() / 4 );
+                village->setParentItem( rectItem );
+                village->setZValue( 10 );
+            }
         }
     }
 
@@ -252,6 +266,8 @@ vec2DTiles QMainWorld::makeMapTiles( int nX, int nY, eTileAlgorithm eAlgorithm )
         default: { makeMapTilesV1( nX, nY, vec2DTiles ); } break;
     }
 
+    makeObject( vec2DTiles );
+
     return vec2DTiles;
 }
 
@@ -372,7 +388,169 @@ void QMainWorld::makeObject( vec2DTiles& vec2DTiles )
     }
 
     // 마을 개수
-    int nVillageMin;
+    int nVillageMin = nTotalCount / OF_VILLAGE_MIN;
+    int nVillageMax = nTotalCount / OF_VILLAGE_MAX;
+    int nVillageCnt = Ext::Util::cRandom< int >( nVillageMin, nVillageMax ).Generate();
+
+    int nHouseMin = nTotalCount / OF_HOUSE_MIN;
+    int nHouseMax = nTotalCount / OF_HOUSE_MAX;
+    int nHouseCnt = Ext::Util::cRandom< int >( nHouseMin, nHouseMax ).Generate();
+
+    int nClanMin = nTotalCount / OF_CLAN_MIN;
+    int nClanMax = nTotalCount / OF_CLAN_MAX;
+    int nClanCnt = Ext::Util::cRandom< int >( nClanMin, nClanMax ).Generate();
+
+    int nXMax = vec2DTiles.count();
+
+    int nLineToVillage   = 0;
+    int nLineToHouse     = 0;
+    int nLineClan        = 0;
+
+    if( nXMax > nVillageCnt )
+    {
+        nLineToVillage = ceil( ( float )nXMax / nVillageCnt );
+        nLineToHouse = ceil( ( float )nXMax / nHouseCnt );
+        nLineClan = ceil( ( float )nXMax / nClanCnt );
+    }
+    else
+    {
+        nLineToVillage = ceil( ( float )nVillageCnt / nXMax );
+        nLineToHouse = ceil( ( float )nHouseCnt / nXMax );
+        nLineClan = ceil( ( float )nClanCnt / nXMax );
+    }
+
+    makeObjectImpl( vec2DTiles, OF_OBJECT_VILLAGE, nLineToVillage );
+    makeObjectImpl( vec2DTiles, OF_OBJECT_CLAN, nLineClan );
+    makeObjectImpl( vec2DTiles, OF_OBJECT_HOUSE, nLineToHouse );
+}
+
+void QMainWorld::makeObjectImpl( vec2DTiles& vec2DTiles, eOFObject eObject, int nMakeObjectToLine )
+{
+    int nRemainVillage = 0;
+    int nRemainHouse = 0;
+    int nRemainClan = 0;
+
+    QSet< int > setDuplVillageX;
+    QSet< int > setDuplVillageY;
+
+    QSet< int > setDuplHouseX;
+    QSet< int > setDuplHouseY;
+
+    QSet< int > setClanX;
+    QSet< int > setClanY;
+
+    int nRemainCnt = 0;
+    int nMaxX = 0;
+
+    Ext::Util::cRandom< int > cRandomObject = Ext::Util::cRandom< int >( 0, 1000 );
+
+    for( auto vecX : vec2DTiles )
+    {
+        int nInstallCnt = nMakeObjectToLine;
+
+        nMaxX = vecX.count();
+
+        Ext::Util::cRandom< int > cRandomY = Ext::Util::cRandom< int >( 0, vecX.count() );
+        Ext::Util::cRandom< int > cRandomX = Ext::Util::cRandom< int >( 0, vec2DTiles.count() );
+
+        // 3회만 랜덤하도록 함. 안 되면 Remain으로 남김
+        for( int idx = 0; idx < 3; idx++ )
+        {
+            if( nInstallCnt <= 0 )
+                break;
+
+            int nY = cRandomY.Generate();
+
+            auto item = vecX[ nY ];
+
+            if( item.eObject != OF_OBJECT_NONE )
+            {
+                nRemainCnt++;
+                continue;
+            }
+
+            int nCompare = getObjectPercentage( eObject, item.eTile );
+
+            if( cRandomObject.Generate() >= nCompare )
+            {
+                item.eObject = OF_OBJECT_VILLAGE;
+                nInstallCnt--;
+            }
+            else
+            {
+                nRemainCnt++;
+            }
+        }
+    }
+
+    int nXRandom = vec2DTiles.count();
+
+    Ext::Util::cRandom< int > cRandomY = Ext::Util::cRandom< int >( 0, nMaxX );
+    Ext::Util::cRandom< int > cRandomX = Ext::Util::cRandom< int >( 0, vec2DTiles.count() );
+
+    while( nRemainCnt > 0 )
+    {
+        int nX = cRandomX.Generate();
+        int nY = cRandomY.Generate();
+
+        auto& item = vec2DTiles[ nX ][ nY ];
+
+        if( item.eObject != OF_OBJECT_NONE )
+            continue;
+
+        int nCompare = getObjectPercentage( eObject, item.eTile );
+
+        if( cRandomObject.Generate() >= nCompare )
+        {
+            item.eObject = eObject;
+            nRemainCnt--;
+        }
+    }
+}
+
+int QMainWorld::getObjectPercentage( eOFObject eObject, eTiles eTile )
+{
+    int nCompare = 10000;
+
+    if( eObject == OF_OBJECT_VILLAGE )
+    {
+        if( eTile == OF_TILE_COAST || eTile == OF_TILE_LAKE )
+            nCompare -= 800;
+        else if( eTile == OF_TILE_SNOW || eTile == OF_TILE_VOLCANO )
+            nCompare -= 900;
+        else if( eTile == OF_TILE_CLIFF )
+            nCompare -= 950;
+        else if( eTile == OF_TILE_MOUNTAIN )
+            nCompare -= 600;
+        else
+            nCompare -= 300;
+    }
+    else if( eObject == OF_OBJECT_HOUSE )
+    {
+        if( eTile == OF_TILE_COAST || eTile == OF_TILE_LAKE )
+            nCompare -= 1000;
+        else if( eTile == OF_TILE_SNOW || eTile == OF_TILE_VOLCANO )
+            nCompare -= 900;
+        else if( eTile == OF_TILE_CLIFF )
+            nCompare -= 800;
+        else if( eTile == OF_TILE_MOUNTAIN )
+            nCompare -= 500;
+        else
+            nCompare -= 300;
+    }
+    else if( eObject == OF_OBJECT_CLAN )
+    {
+        if( eTile == OF_TILE_COAST || eTile == OF_TILE_LAKE )
+            nCompare -= 500;
+        else if( eTile == OF_TILE_SNOW || eTile == OF_TILE_VOLCANO )
+            nCompare -= 600;
+        else if( eTile == OF_TILE_CLIFF )
+            nCompare -= 900;
+        else
+            nCompare -= 300;
+    }
+
+    return nCompare;
 }
 
 QColor QMainWorld::getTileColor( eTiles eTile )
@@ -397,6 +575,29 @@ QColor QMainWorld::getTileColor( eTiles eTile )
 
     QColor color( sColor );
     return color;
+}
+
+QString QMainWorld::getTileName( eTiles eTile )
+{
+    QString sTileName;
+
+    switch( eTile )
+    {
+        case OF_TILE_NONE: { sTileName = "없음"; } break;
+        case OF_TILE_FLAT: { sTileName = "평지"; } break;
+        case OF_TILE_GRASS: { sTileName = "초원"; } break;
+        case OF_TILE_MOUNTAIN: { sTileName = "산"; } break;
+        case OF_TILE_CLIFF: { sTileName = "절벽"; } break;
+        case OF_TILE_COAST: { sTileName = "호수"; } break;
+        case OF_TILE_LAKE: { sTileName = "해안"; } break;
+        case OF_TILE_HILLS: { sTileName = "언덕"; } break;
+        case OF_TILE_WOODS: { sTileName = "숲"; } break;
+        case OF_TILE_SNOW: { sTileName = "빙하"; } break;
+        case OF_TILE_VOLCANO: { sTileName = "화산"; } break;
+        default: { sTileName = "#없음"; }break;
+    }
+
+    return sTileName;
 }
 
 eTiles QMainWorld::getRecommendTile( eTiles eTile, QPoint pCurrent, QPoint pMax, int nRandom )

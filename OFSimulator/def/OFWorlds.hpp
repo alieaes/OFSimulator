@@ -35,7 +35,7 @@ enum eOFObject
     OF_OBJECT_CLAN    = 2,
 
     // 기연을 위한?
-    OF_TITLE_HOUSE    = 3
+    OF_OBJECT_HOUSE   = 3
 };
 
 struct stOFTileInfo
@@ -47,6 +47,9 @@ struct stOFTileInfo
 
     // 영기
     int                        nEarthPower        = 0;
+
+    int                        nPositiveEnergy    = 0;
+    int                        nNegativeEnergy    = 0;
 
     stOFTileInfo()
     {
@@ -60,6 +63,7 @@ struct stOFTileInfo
         nEarthPower = 0;
     }
 };
+Q_DECLARE_METATYPE( stOFTileInfo )
 
 typedef QVector< QVector< stOFTileInfo > > vec2DTiles;
 
