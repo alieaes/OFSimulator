@@ -1115,7 +1115,7 @@ QPushButton:pressed
                         <number>0</number>
                        </property>
                        <item>
-                        <widget class="QStackedWidget" name="stackedWidget">
+                        <widget class="QStackedWidget" name="wdgMap">
                          <property name="sizePolicy">
                           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                            <horstretch>0</horstretch>
@@ -1351,7 +1351,7 @@ QPushButton:pressed
                         <number>0</number>
                        </property>
                        <item>
-                        <widget class="QStackedWidget" name="stackedWidget_2">
+                        <widget class="QStackedWidget" name="wdgDetail">
                          <widget class="QWidget" name="page_4"/>
                          <widget class="QWidget" name="page_5">
                           <layout class="QVBoxLayout" name="verticalLayout_14">
