@@ -137,12 +137,22 @@ enum eOFPurity
 {
     OF_PURITY_NONE   = 0,
 
+    // 평범
     OF_PURITY_NORMAL = 1,
+
+    // 순수한 내공
     OF_PURITY_PURE   = 2,
+
+    // 파괴적
     OF_PURITY_POWER  = 4,
 
+    // 불순한 내공
     OF_PURITY_IMPURE = 8,
+
+    // 사파?
     OF_PURITY_BAD    = 16,
+
+    // 마공
     OF_PURITY_DARK   = 32
 };
 
