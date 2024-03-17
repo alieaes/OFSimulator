@@ -21,7 +21,7 @@ OFSimulator::OFSimulator( QWidget* parent )
     auto tdModuleManager = Module::tdStModuleManager::GetInstance();
     tdModuleManager->RegisterModule( L"CHARACTER", L"CHARACTER", new cCharacterModule( this ) );
 
-    auto spModule = Module::GetModule< cCharacterModule >( L"CHARACTER" );
+    auto spCharacterModule = Module::GetModule< cCharacterModule >( L"CHARACTER" );
 }
 
 OFSimulator::~OFSimulator()
@@ -33,6 +33,15 @@ void OFSimulator::WorldStart()
         _World = new QMainWorld( this, ui );
 
     _World->Init();
+}
+
+void OFSimulator::CharacterStart()
+{
+    if( _Character == NULLPTR )
+        _Character = new QCharacter( this, ui );
+
+    auto spCharacterModule = Module::GetModule< cCharacterModule >( L"CHARACTER" );
+    spCharacterModule->MakeCharacter();
 }
 
 void OFSimulator::on_btnNewGame_clicked()

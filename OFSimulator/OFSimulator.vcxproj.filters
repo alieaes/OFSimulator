@@ -91,6 +91,12 @@
     <ClCompile Include="..\ExLibs\Module\EXModuleManager.cpp">
       <Filter>Libs\Module</Filter>
     </ClCompile>
+    <ClCompile Include="..\ExLibs\Util\EXEnumUtil.cpp">
+      <Filter>Libs\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\QCharacter.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ExLibs\Base\ExtConfig.hpp">
@@ -123,6 +129,9 @@
     <ClInclude Include="..\ExLibs\Module\EXModuleManager.hpp">
       <Filter>Libs\Module</Filter>
     </ClInclude>
+    <ClInclude Include="..\ExLibs\Util\EXEnumUtil.hpp">
+      <Filter>Libs\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="UI\QLoadingPage.hpp">
@@ -136,6 +145,9 @@
     </QtMoc>
     <QtMoc Include="Module\cCharacterModule.hpp">
       <Filter>Module</Filter>
+    </QtMoc>
+    <QtMoc Include="UI\QCharacter.hpp">
+      <Filter>UI</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>

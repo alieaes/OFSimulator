@@ -110,7 +110,9 @@
     <ClCompile Include="..\ExLibs\Module\EXModuleBase.cpp" />
     <ClCompile Include="..\ExLibs\Module\EXModuleManager.cpp" />
     <ClCompile Include="..\ExLibs\String\EXString.cpp" />
+    <ClCompile Include="..\ExLibs\Util\EXEnumUtil.cpp" />
     <ClCompile Include="Module\cCharacterModule.cpp" />
+    <ClCompile Include="UI\QCharacter.cpp" />
     <ClCompile Include="UI\QLoadingPage.cpp" />
     <ClCompile Include="UI\QMainWorld.cpp" />
     <ClCompile Include="UI\QMakeProfile.cpp" />
@@ -118,9 +120,11 @@
     <ClInclude Include="..\ExLibs\Module\ExModuleDefines.hpp" />
     <ClInclude Include="..\ExLibs\Module\EXModuleManager.hpp" />
     <ClInclude Include="..\ExLibs\String\EXString.hpp" />
+    <ClInclude Include="..\ExLibs\Util\EXEnumUtil.hpp" />
     <ClInclude Include="def\OFCharacter.hpp" />
     <ClInclude Include="def\OFDefines.hpp" />
     <ClInclude Include="def\OFWorlds.hpp" />
+    <QtMoc Include="UI\QCharacter.hpp" />
     <QtMoc Include="UI\QMainWorld.hpp" />
     <QtMoc Include="UI\QMakeProfile.hpp" />
     <QtMoc Include="UI\QLoadingPage.hpp" />

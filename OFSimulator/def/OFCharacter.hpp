@@ -255,7 +255,9 @@ struct stCharacterInfo : stCharacterHistory, stDefStatus, stInjury, stcharacterA
 {
     XString                    sUUID;
 
-    XString                    sCharacterName;
+    XString                    sFirstName;
+    XString                    sSecondName;
+
     XString                    sAlias;
 
     eOFGender                  eGender              = OF_GENDER_NONE;
@@ -275,7 +277,8 @@ struct stCharacterInfo : stCharacterHistory, stDefStatus, stInjury, stcharacterA
     void ClearChracterInfo()
     {
         sUUID.clear();
-        sCharacterName.clear();
+        sFirstName.clear();
+        sSecondName.clear();
         sAlias.clear();
 
         eGender = OF_GENDER_NONE;
@@ -298,5 +301,23 @@ struct stCharacterInfo : stCharacterHistory, stDefStatus, stInjury, stcharacterA
         ClearSecretStatus();
     }
 };
+
+struct stOFCharacter
+{
+    stCharacterInfo            stInfo;
+
+    QPoint                     pCoord = QPoint( 0, 0 );
+
+    QString                    sColor;
+};
+
+const int OF_CHARACTER_DATA_UUID         = 20000;
+
+const QSize OF_CHARACTER_LEVEL_1               = QSize( 7, 7 );
+const QSize OF_CHARACTER_LEVEL_2               = QSize( 8, 8 );
+const QSize OF_CHARACTER_LEVEL_3               = QSize( 9, 9 );
+const QSize OF_CHARACTER_LEVEL_4               = QSize( 10, 10 );
+const QSize OF_CHARACTER_LEVEL_5               = QSize( 11, 11 );
+const QSize OF_CHARACTER_LEVEL_6               = QSize( 12, 12 );
 
 #endif

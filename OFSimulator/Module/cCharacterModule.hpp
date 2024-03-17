@@ -3,6 +3,7 @@
 #ifndef __HDR_OF_CHARACTER_MODULE__
 #define __HDR_OF_CHARACTER_MODULE__
 
+#include "OFSimulator.h"
 #include "Module/EXModuleBase.hpp"
 
 #include "def/OFCharacter.hpp"
@@ -17,10 +18,17 @@ public:
 
     bool                                     NotifyModule( const XString& sNotifyJobs ) override;
 
-    void                                     SetName( const XString& sName );
-
     bool                                     Save();
     bool                                     Load();
+
+    void                                     MakeCharacter();
+
+    void                                     SetCharacterCoord( const QString& sUUID, QPoint pCoord );
+    void                                     SetCharacterColor( const QString& sUUID, const QString& sColor );
+
+    stOFCharacter*                           GetCharacter( const QString& sUUID );
+
+    bool                                     IsExistCharacter( const QString& sUUID );
 
 protected:
     bool                                     moduleInit() override;
@@ -29,7 +37,18 @@ protected:
     bool                                     moduleFinal() override;
 
 private:
-    stCharacterInfo                          _info;
+    XString                                  createCharacterName( const eOFGender& eGender, const XString& sFirstName = "" );
+
+    XString                                  createFirstName( const eOFGender& eGender );
+    XString                                  createSecondName( const eOFGender& eGender );
+
+private:
+    QReadWriteLock                           _lckCharacter;
+
+    OFSimulator*                             _parent;
+
+    QHash< QString, stOFCharacter >          _char;
+
 };
 
 

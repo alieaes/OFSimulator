@@ -5,6 +5,8 @@
 
 #include "String/EXString.hpp"
 
+#include "Util/EXUtil.hpp"
+
 enum eTiles
 {
     OF_TILE_NONE = 0,

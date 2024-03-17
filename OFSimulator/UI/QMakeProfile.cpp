@@ -63,9 +63,9 @@ void QMakeProfile::OnBtnProfileCreateClicked()
     }
 
     auto spCharacter = Module::GetModule< cCharacterModule >( L"CHARACTER" );
-    spCharacter->SetName( ui.edtProfileName->text() );
 
     qobject_cast< OFSimulator* >( parent() )->WorldStart();
+    qobject_cast< OFSimulator* >( parent() )->CharacterStart();
 }
 
 void QMakeProfile::OnBtnProfileCloseClicked()

@@ -3,6 +3,9 @@
 #include "UI/QMainWorld.hpp"
 
 #include "Base/ExtConfig.hpp"
+#include "def/OFCharacter.hpp"
+#include "Module/cCharacterModule.hpp"
+#include "Module/EXModuleManager.hpp"
 #include "Util/EXUtil.hpp"
 
 QMainWorld::QMainWorld( QWidget* parent, Ui::OFSimulatorClass _ui )
@@ -21,8 +24,14 @@ void QMainWorld::Init()
 {
     ui.ControlCentor->setCurrentIndex( 3 );
 
+    qreal rSceneWidth = ui.gvMap->width() * 4;
+    qreal rSceneHeight = ui.gvMap->height() * 4;
+
+    qreal rPixmapWidth = ui.gvMap->width() * 4;
+    qreal rPixmapHeight = ui.gvMap->width() * 4;
+
     QGraphicsScene* scene = new QGraphicsScene( this );
-    scene->setSceneRect( 0, 0, ui.gvMap->width() * 3, ui.gvMap->height() * 3 );
+    scene->setSceneRect( 0, 0, rSceneWidth, rSceneHeight );
     _scene = scene;
 
     ui.gvMap->setBackgroundBrush( QBrush( "#302f2b" ) );
@@ -31,82 +40,95 @@ void QMainWorld::Init()
     ui.gvMap->setMouseTracking( true );
     ui.gvMap->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     ui.gvMap->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-    ui.gvMap->setViewportUpdateMode( QGraphicsView::BoundingRectViewportUpdate );
+    ui.gvMap->setViewportUpdateMode( QGraphicsView::FullViewportUpdate );
     ui.gvMap->setCacheMode( QGraphicsView::CacheBackground );
-    ui.gvMap->setViewportUpdateMode( QGraphicsView::SmartViewportUpdate );
+    //ui.gvMap->setViewportUpdateMode( QGraphicsView::SmartViewportUpdate );
     ui.gvMap->setRenderHint( QPainter::Antialiasing );
-
     _scaleFactor = 1.0f;
 
-    QPixmap pix( _scene->width(), _scene->height() );
-    pix.fill( QColor( "#1e1e1e" ) );
-    _pixmap = scene->addPixmap( pix );
+    QPixmap pixMap( rPixmapWidth, rPixmapHeight );
+    pixMap.fill( QColor( "#1e1e1e" ) );
+    _pixmap = scene->addPixmap( pixMap );
     _pixmap->setPos( 0, 0 );
-    _scene->installEventFilter( this );
+    //_scene->installEventFilter( this );
+    ui.gvMap->update();
 
     qreal rect_size = 60; // 네모의 크기
 
-    qDebug() << "width=" << _scene->width() << "|height=" << _scene->height();
-
-    int nRectXCount = _scene->width() / rect_size;
-    int nRectYCount = _scene->height() / rect_size;
+    int nRectXCount = _pixmap->pixmap().width() / OF_RECT_SIZE;
+    int nRectYCount = _pixmap->pixmap().height() / OF_RECT_SIZE;
     int nRectFullCount = nRectXCount * nRectYCount;
 
     _vecTiles = makeMapTiles( nRectXCount, nRectYCount, OF_TILE_ALGORITHM_V1 );
 
-    int nOffsetX = 0;
+    int nWriteX = 0;
+    int nWriteY = 0;
 
-    for( int idx = 0; idx < nRectXCount; idx++, nOffsetX += rect_size )
+    for( int idx = 0; idx < nRectXCount; idx++ )
     {
         for( int idx2 = 0; idx2 < nRectYCount; idx2++ )
         {
-            qreal rectX = rect_size * idx;
-            qreal rectY = rect_size * idx2;
+            qreal rectX = OF_RECT_SIZE * idx2;
+            qreal rectY = OF_RECT_SIZE * idx;
 
-            QColor tileColor = getTileColor( _vecTiles[ idx ][ idx2 ].eTile );
+            auto& item = _vecTiles[ idx ][ idx2 ];
+            QColor tileColor = getTileColor( item.eTile );
 
-            QGraphicsRectItem* rectItem = scene->addRect( rectX, rectY, rect_size, rect_size, QPen( Qt::white ), QBrush( tileColor ) );
+            item.pCoord = QPoint( rectX, rectY );
+
+            QGraphicsRectItem* rectItem = scene->addRect( rectX, rectY, OF_RECT_SIZE, OF_RECT_SIZE, QPen( Qt::white ), QBrush( tileColor ) );
+
+            nWriteX = rectItem->rect().width();
+            nWriteY = rectItem->rect().height();
+
             rectItem->setParentItem( _pixmap );
 
             QVariant var;
-            var.setValue( _vecTiles[ idx ][ idx2 ] );
-            rectItem->setData( OF_DATA_TILE_INFO, var );
+            var.setValue( item );
+            rectItem->setData( OF_MAP_DATA_TILE_INFO, var );
 
-            if( _vecTiles[ idx ][ idx2 ].eObject == OF_OBJECT_VILLAGE )
+            if( item.eObject == OF_OBJECT_VILLAGE )
             {
                 QPixmap pix( 32, 32 );
                 pix.load( ":/OFSimulator/res/village.png" );
 
                 QGraphicsPixmapItem* village = scene->addPixmap( pix );
                 village->setScale( 0.5 );
-                village->setPos( rectX + rect_size / 2 - pix.width() / 4, rectY + rect_size / 2 - pix.height() / 4 );
+                village->setPos( rectX + OF_RECT_SIZE / 2 - pix.width() / 4, rectY + OF_RECT_SIZE / 2 - pix.height() / 4 );
                 village->setParentItem( rectItem );
                 village->setZValue( 10 );
+                village->setData( OF_MAP_DATA_PARENT_TILE, true );
             }
-            else if( _vecTiles[ idx ][ idx2 ].eObject == OF_OBJECT_HOUSE )
+            else if( item.eObject == OF_OBJECT_HOUSE )
             {
                 QPixmap pix( 32, 32 );
                 pix.load( ":/OFSimulator/res/house.png" );
 
                 QGraphicsPixmapItem* village = scene->addPixmap( pix );
                 village->setScale( 0.5 );
-                village->setPos( rectX + rect_size / 2 - pix.width() / 4, rectY + rect_size / 2 - pix.height() / 4 );
+                village->setPos( rectX + OF_RECT_SIZE / 2 - pix.width() / 4, rectY + OF_RECT_SIZE / 2 - pix.height() / 4 );
                 village->setParentItem( rectItem );
                 village->setZValue( 10 );
+                village->setData( OF_MAP_DATA_PARENT_TILE, true );
             }
-            else if( _vecTiles[ idx ][ idx2 ].eObject == OF_OBJECT_CLAN )
+            else if( item.eObject == OF_OBJECT_CLAN )
             {
                 QPixmap pix( 32, 32 );
                 pix.load( ":/OFSimulator/res/banner.png" );
 
                 QGraphicsPixmapItem* village = scene->addPixmap( pix );
                 village->setScale( 0.5 );
-                village->setPos( rectX + rect_size / 2 - pix.width() / 4, rectY + rect_size / 2 - pix.height() / 4 );
+                village->setPos( rectX + OF_RECT_SIZE / 2 - pix.width() / 4, rectY + OF_RECT_SIZE / 2 - pix.height() / 4 );
                 village->setParentItem( rectItem );
                 village->setZValue( 10 );
+                village->setData( OF_MAP_DATA_PARENT_TILE, true );
             }
         }
     }
+
+    qDebug() << "width=" << _scene->width() << "|height=" << _scene->height();
+    qDebug() << "width=" << nRectXCount * OF_RECT_SIZE << "|height=" << nRectYCount * OF_RECT_SIZE;
+    qDebug() << "width=" << nWriteX << "|height=" << nWriteY;
 
     //QGraphicsEllipseItem* dot = scene->addEllipse( 0, 0, 5, 5, QPen(), QBrush( Qt::red ) );
     //dot->setPos( 0, 0 ); // Position of the dot
@@ -197,6 +219,8 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
                 {
                 ui.gvMap->setTransformationAnchor( QGraphicsView::AnchorUnderMouse );
                 ui.gvMap->setDragMode( QGraphicsView::ScrollHandDrag );
+                ui.gvMap->setInteractive( false );
+                ui.gvMap->scene()->update();
                 }
             break;
             default:
@@ -211,6 +235,8 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
         {
             case Qt::Key_Control:
             ui.gvMap->setDragMode( QGraphicsView::NoDrag );
+            ui.gvMap->setInteractive( true );
+            ui.gvMap->scene()->update();
             break;
             default:
             break;
@@ -265,20 +291,91 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
         {
             qDebug() << "LeftButton clicked";
 
-            auto mapPoint = _pixmap->mapFromScene( mouseEvent->pos() );
+            qDebug() << "H=" << ui.gvMap->horizontalScrollBar()->value() << "|V=" << ui.gvMap->verticalScrollBar()->value();
 
-            QGraphicsItem* item = _scene->itemAt( mapPoint, _pixmap->transform() );
+            QPoint p = mouseEvent->pos();
 
-            auto pItem = dynamic_cast< QGraphicsRectItem* >( item );
+            p.setX( p.x() + ui.gvMap->horizontalScrollBar()->value() );
+            p.setY( p.y() + ui.gvMap->verticalScrollBar()->value() );
 
-            if( pItem != NULLPTR )
+            //auto mapPoint = ui.gvMap->mapFromScene( mouseEven t->pos() );
+            QGraphicsItem* item = _scene->itemAt( p, _pixmap->sceneTransform() );
+            auto lstItem = _scene->items( p, Qt::IntersectsItemShape, Qt::DescendingOrder, _pixmap->sceneTransform() );
+
+            QGraphicsRectItem* pItem = NULLPTR;
+
+            for( auto* itemTmp : lstItem )
             {
-                int a = 0;
-                //a = pItem->data( OF_DATA_MAP ).toInt();
+                pItem = dynamic_cast< QGraphicsRectItem* >( itemTmp );
+
+                if( pItem != NULLPTR )
+                    break;
             }
+
+            ui.lblMapPoint->setText( QString( "-, -" ) );
+            ui.lblMapTile->setText( QString( "-" ) );
+            ui.lblMapObject->setText( QString( "-" ) );
+            ui.lstCharacter->clear();
+
+            do
+            {
+                if( pItem == NULLPTR )
+                {
+                    auto pItemChild = dynamic_cast< QGraphicsPixmapItem* >( item );
+
+                    if( pItemChild == NULLPTR )
+                    {
+                        auto pCharacter = dynamic_cast< QGraphicsEllipseItem* >( item );
+
+                        if( pCharacter == NULLPTR )
+                            break;
+                    }
+
+                    if( pItemChild->data( OF_MAP_DATA_PARENT_TILE ).toBool() == false )
+                        break;
+
+                    pItem = dynamic_cast< QGraphicsRectItem* >( pItemChild->parentItem() );
+
+                    if( pItem == NULLPTR )
+                        break;
+                }
+
+                QVariant var = pItem->data( OF_MAP_DATA_TILE_INFO );
+                stOFTileInfo data = var.value<stOFTileInfo>();
+
+                ui.lblMapPoint->setText( QString( "%1, %2" ).arg( data.pCoord.x() ).arg( data.pCoord.y() ) );
+                ui.lblMapTile->setText( QString( "%1" ).arg( getTileName( data.eTile ) ) );
+                ui.lblMapObject->setText( QString( "%1" ).arg( getObjectName( data.eObject ) ) );
+
+                QRect rect( QPoint( data.pCoord.x(), data.pCoord.y() ), QPoint( data.pCoord.x() + OF_RECT_SIZE - 1, data.pCoord.y() + OF_RECT_SIZE - 1) );
+                auto lstCharacter = _scene->items( rect, Qt::IntersectsItemShape, Qt::DescendingOrder, _pixmap->sceneTransform() );
+
+                for( auto ofCharacter : lstCharacter )
+                {
+                    auto pCharacter = dynamic_cast< QGraphicsEllipseItem* >( ofCharacter );
+
+                    if( pCharacter == NULLPTR )
+                        continue;
+
+                    QString sUUID = ofCharacter->data( OF_CHARACTER_DATA_UUID ).toString();
+
+                    if( sUUID.isEmpty() == true )
+                        continue;
+
+                    auto spCharacterModule = Ext::Module::GetModule< cCharacterModule >( L"CHARACTER" );
+                    stOFCharacter* OFCharacter = spCharacterModule->GetCharacter( sUUID );
+
+                    if( OFCharacter == NULLPTR )
+                        continue;
+
+                    QString sName = OFCharacter->stInfo.sFirstName + " " + OFCharacter->stInfo.sSecondName;
+                    ui.lstCharacter->addItem( sName );
+                }
+
+            } while( false );
+
         }
     }
-
 
     return QWidget::eventFilter( watched, event );
 }
@@ -645,6 +742,21 @@ QString QMainWorld::getTileName( eTiles eTile )
     }
 
     return sTileName;
+}
+
+QString QMainWorld::getObjectName( eOFObject eObject )
+{
+    QString sObjectName;
+
+    switch (eObject) {
+        case OF_OBJECT_NONE: { sObjectName = "-"; } break;
+        case OF_OBJECT_VILLAGE: { sObjectName = "마을"; } break;
+        case OF_OBJECT_CLAN: { sObjectName = "문파"; } break;
+        case OF_OBJECT_HOUSE: { sObjectName = "이름 없는 집"; } break;
+        default: { sObjectName = "-"; } break;
+    }
+
+    return sObjectName;
 }
 
 eTiles QMainWorld::getRecommendTile( eTiles eTile, QPoint pCurrent, QPoint pMax, int nRandom )
