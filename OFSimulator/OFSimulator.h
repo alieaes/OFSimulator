@@ -29,6 +29,8 @@ public slots:
     void                                      on_btnContinue_clicked();
     void                                      on_btnExit_clicked();
 
+    void                                      CharacterViewDoubleClicked( const QListWidgetItem* item );
+
 protected:
 
 private:

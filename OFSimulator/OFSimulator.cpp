@@ -22,6 +22,8 @@ OFSimulator::OFSimulator( QWidget* parent )
     tdModuleManager->RegisterModule( L"CHARACTER", L"CHARACTER", new cCharacterModule( this ) );
 
     auto spCharacterModule = Module::GetModule< cCharacterModule >( L"CHARACTER" );
+
+    QObject::connect( ui.lstCharacter, &QListWidget::itemDoubleClicked, this, &OFSimulator::CharacterViewDoubleClicked );
 }
 
 OFSimulator::~OFSimulator()
@@ -59,4 +61,8 @@ void OFSimulator::on_btnContinue_clicked()
 void OFSimulator::on_btnExit_clicked()
 {
     exit( -1 );
+}
+
+void OFSimulator::CharacterViewDoubleClicked( const QListWidgetItem* item )
+{
 }

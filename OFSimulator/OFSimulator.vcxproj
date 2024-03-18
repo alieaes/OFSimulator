@@ -109,8 +109,12 @@
   <ItemGroup>
     <ClCompile Include="..\ExLibs\Module\EXModuleBase.cpp" />
     <ClCompile Include="..\ExLibs\Module\EXModuleManager.cpp" />
+    <ClCompile Include="..\ExLibs\SQLite\EXSQLite.cpp" />
+    <ClCompile Include="..\ExLibs\SQLite\include\sqlite3.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\ExLibs\String\EXString.cpp" />
-    <ClCompile Include="..\ExLibs\Util\EXEnumUtil.cpp" />
+    <ClCompile Include="..\ExLibs\Util\EXFile.cpp" />
     <ClCompile Include="Module\cCharacterModule.cpp" />
     <ClCompile Include="UI\QCharacter.cpp" />
     <ClCompile Include="UI\QLoadingPage.cpp" />
@@ -119,8 +123,13 @@
     <ClInclude Include="..\ExLibs\Module\EXModuleBase.hpp" />
     <ClInclude Include="..\ExLibs\Module\ExModuleDefines.hpp" />
     <ClInclude Include="..\ExLibs\Module\EXModuleManager.hpp" />
+    <ClInclude Include="..\ExLibs\SQLite\EXSQLite.hpp" />
+    <ClInclude Include="..\ExLibs\SQLite\include\sqlite3.h" />
+    <ClInclude Include="..\ExLibs\String\EXFormat.hpp" />
+    <ClInclude Include="..\ExLibs\String\EXFormatTypes.hpp" />
     <ClInclude Include="..\ExLibs\String\EXString.hpp" />
-    <ClInclude Include="..\ExLibs\Util\EXEnumUtil.hpp" />
+    <ClInclude Include="..\ExLibs\Util\EXFile.hpp" />
+    <ClInclude Include="..\ExLibs\Util\Json\nlohmann\json.hpp" />
     <ClInclude Include="def\OFCharacter.hpp" />
     <ClInclude Include="def\OFDefines.hpp" />
     <ClInclude Include="def\OFWorlds.hpp" />

@@ -42,6 +42,15 @@
     <Filter Include="Libs\Module">
       <UniqueIdentifier>{527cb69f-9b60-4918-8c8e-8308f811a227}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Libs\SQLite">
+      <UniqueIdentifier>{2f9b6e06-cf66-4998-8cdc-93ca08a1bb46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libs\SQLite\Include">
+      <UniqueIdentifier>{1eb3fbc5-176e-4a51-904e-8b3ced79765e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libs\Util\Json">
+      <UniqueIdentifier>{7d17159f-a57a-4dcb-8da7-7d47382bc621}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="OFSimulator.qrc">
@@ -91,11 +100,17 @@
     <ClCompile Include="..\ExLibs\Module\EXModuleManager.cpp">
       <Filter>Libs\Module</Filter>
     </ClCompile>
-    <ClCompile Include="..\ExLibs\Util\EXEnumUtil.cpp">
-      <Filter>Libs\Util</Filter>
-    </ClCompile>
     <ClCompile Include="UI\QCharacter.cpp">
       <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ExLibs\SQLite\EXSQLite.cpp">
+      <Filter>Libs\SQLite</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ExLibs\SQLite\include\sqlite3.c">
+      <Filter>Libs\SQLite\Include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ExLibs\Util\EXFile.cpp">
+      <Filter>Libs\Util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -129,7 +144,22 @@
     <ClInclude Include="..\ExLibs\Module\EXModuleManager.hpp">
       <Filter>Libs\Module</Filter>
     </ClInclude>
-    <ClInclude Include="..\ExLibs\Util\EXEnumUtil.hpp">
+    <ClInclude Include="..\ExLibs\SQLite\EXSQLite.hpp">
+      <Filter>Libs\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExLibs\SQLite\include\sqlite3.h">
+      <Filter>Libs\SQLite\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExLibs\Util\Json\nlohmann\json.hpp">
+      <Filter>Libs\Util\Json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExLibs\String\EXFormatTypes.hpp">
+      <Filter>Libs\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExLibs\String\EXFormat.hpp">
+      <Filter>Libs\SQLite</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ExLibs\Util\EXFile.hpp">
       <Filter>Libs\Util</Filter>
     </ClInclude>
   </ItemGroup>

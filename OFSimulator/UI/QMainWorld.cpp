@@ -369,11 +369,15 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
                         continue;
 
                     QString sName = OFCharacter->stInfo.sFirstName + " " + OFCharacter->stInfo.sSecondName;
+
+                    //QListWidgetItem item = ;
+                    //item.setText( sName );
+                    //item.setData( OF_CHARACTER_DATA_UUID, sUUID );
+
                     ui.lstCharacter->addItem( sName );
                 }
 
             } while( false );
-
         }
     }
 
