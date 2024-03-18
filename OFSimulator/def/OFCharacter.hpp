@@ -261,6 +261,13 @@ enum eOFGender
     OF_GENDER_ASEXUAL  = 3
 };
 
+EXT_ENUM_START( eOFGender )
+EXT_ENUM_ADD( OF_GENDER_NONE, "없음" )
+EXT_ENUM_ADD( OF_GENDER_MALE, "남자" )
+EXT_ENUM_ADD( OF_GENDER_FEMALE, "여자" )
+EXT_ENUM_ADD( OF_GENDER_ASEXUAL, "무성" )
+EXT_ENUM_END( eOFGender )
+
 struct stCharacterInfo : stCharacterHistory, stDefStatus, stInjury, stcharacterAttr, stCharacterQuality, stSecretStatus
 {
     XString                    sUUID;

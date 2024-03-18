@@ -31,6 +31,8 @@ public slots:
 
     void                                      CharacterViewDoubleClicked( const QListWidgetItem* item );
 
+    void                                      CharacterViewClear();
+
 protected:
 
 private:

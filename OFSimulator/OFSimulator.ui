@@ -1763,28 +1763,28 @@ QPushButton:pressed
                                          <number>0</number>
                                         </property>
                                         <item>
-                                         <widget class="QLabel" name="label_17">
+                                         <widget class="QLabel" name="lblCOFPower">
                                           <property name="text">
                                            <string>1,000,000,000,000</string>
                                           </property>
                                          </widget>
                                         </item>
                                         <item>
-                                         <widget class="QLabel" name="label_18">
+                                         <widget class="QLabel" name="lblCOFPowerDetail">
                                           <property name="text">
                                            <string>-</string>
                                           </property>
                                          </widget>
                                         </item>
                                         <item>
-                                         <widget class="QLabel" name="label_22">
+                                         <widget class="QLabel" name="lblCDamage">
                                           <property name="text">
                                            <string>0</string>
                                           </property>
                                          </widget>
                                         </item>
                                         <item>
-                                         <widget class="QLabel" name="label_19">
+                                         <widget class="QLabel" name="lblCDefence">
                                           <property name="text">
                                            <string>0</string>
                                           </property>
@@ -2058,84 +2058,84 @@ QPushButton:pressed
                                                <number>0</number>
                                               </property>
                                               <item>
-                                               <widget class="QLabel" name="label_108">
+                                               <widget class="QLabel" name="lblCSTR">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_109">
+                                               <widget class="QLabel" name="lblCDEX">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_110">
+                                               <widget class="QLabel" name="lblCAGI">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_111">
+                                               <widget class="QLabel" name="lblCMOV">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_112">
+                                               <widget class="QLabel" name="lblCINT">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_113">
+                                               <widget class="QLabel" name="lblCVIT">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_114">
+                                               <widget class="QLabel" name="lblCLUK">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_115">
+                                               <widget class="QLabel" name="lblCWIZ">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_116">
+                                               <widget class="QLabel" name="lblCWILL">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_117">
+                                               <widget class="QLabel" name="lblCCON">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_118">
+                                               <widget class="QLabel" name="lblCCHA">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_119">
+                                               <widget class="QLabel" name="lblCSIGHT">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
@@ -2334,56 +2334,56 @@ QPushButton:pressed
                                                <number>0</number>
                                               </property>
                                               <item>
-                                               <widget class="QLabel" name="label_241">
+                                               <widget class="QLabel" name="lblCBlade">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_242">
+                                               <widget class="QLabel" name="lblCSword">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_243">
+                                               <widget class="QLabel" name="lblCSpear">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_244">
+                                               <widget class="QLabel" name="lblCPole">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_245">
+                                               <widget class="QLabel" name="lblCPalm">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_246">
+                                               <widget class="QLabel" name="lblCFist">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_247">
+                                               <widget class="QLabel" name="lblCFinger">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_251">
+                                               <widget class="QLabel" name="lblCProjectile">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
@@ -2588,49 +2588,49 @@ QPushButton:pressed
                                                <number>0</number>
                                               </property>
                                               <item>
-                                               <widget class="QLabel" name="label_400">
+                                               <widget class="QLabel" name="lblCFire">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_401">
+                                               <widget class="QLabel" name="lblCWater">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_402">
+                                               <widget class="QLabel" name="lblCIce">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_403">
+                                               <widget class="QLabel" name="lblCElec">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_404">
+                                               <widget class="QLabel" name="lblCPoison">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_405">
+                                               <widget class="QLabel" name="lblCEarth">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
                                                </widget>
                                               </item>
                                               <item>
-                                               <widget class="QLabel" name="label_410">
+                                               <widget class="QLabel" name="lblCWind">
                                                 <property name="text">
                                                  <string>0</string>
                                                 </property>
