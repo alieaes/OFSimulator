@@ -183,7 +183,7 @@ struct stDefStatus
     unsigned int              uDefence             = 0;
 
     // 힘 : 공격력
-    unsigned int              uSTR                 = 0;
+    unsigned int              uSTR                 = 1;
 
     // 민첩 : 공격속도
     unsigned int              uDEX                 = 0;
@@ -192,13 +192,13 @@ struct stDefStatus
     unsigned int              uAGI                 = 0;
     
     // 민첩 : 이동속도
-    unsigned int              uMOV                 = 0;
+    unsigned int              uMOV                 = 10;
 
     // 지능 : 내공(SP)
-    unsigned int              uINT                 = 0;
+    unsigned int              uINT                 = 10;
 
     // 체력 : 체력(HP)
-    unsigned int              uVIT                 = 0;
+    unsigned int              uVIT                 = 10;
 
     // 운 : 행운
     unsigned int              uLUK                 = 0;
@@ -206,17 +206,17 @@ struct stDefStatus
     // 오성
     unsigned int              uWIZ                 = 0;
 
-    // 정신력
+    // 정신력 ( 내공 저항 )
     unsigned int              uWILL                = 0;
 
-    // 건강
+    // 건강 ( 속성 저항 )
     unsigned int              uCON                 = 0;
 
-    // 매력
+    // 매력 ( 인물 친화력 )
     unsigned int              uCHA                 = 0;
 
-    // 기감(시야)
-    unsigned int              uSight               = 0;
+    // 기감 ( 시야 )
+    unsigned int              uSight               = 10;
 
     stDefStatus()
     {

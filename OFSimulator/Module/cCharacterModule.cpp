@@ -54,6 +54,11 @@ void cCharacterModule::MakeCharacter()
     info.stInfo.sFirstName = createFirstName( info.stInfo.eGender );
     info.stInfo.sSecondName = createSecondName( info.stInfo.eGender );
 
+    info.stInfo.uINT = 10;
+    info.stInfo.uVIT = 10;
+
+    RefreshHP( info.stInfo.sUUID );
+    RefreshSP( info.stInfo.sUUID );
     _char.insert( info.stInfo.sUUID, info );
 
     QMetaObject::invokeMethod( _parent->GetCharacter(), "WriteCharacter", Q_ARG( QString, info.stInfo.sUUID.toQString() ) );
@@ -99,6 +104,56 @@ bool cCharacterModule::IsExistCharacter( const QString& sUUID )
     QReadLocker lck( &_lckCharacter );
 
     return _char.contains( sUUID ) == true;
+}
+
+void cCharacterModule::RefreshHP( const QString& sUUID )
+{
+    stOFCharacter* info = GetCharacter( sUUID );
+
+    if( info != NULLPTR )
+    {
+        if( info->stInfo.uCurrentHP == 0 && info->stInfo.uMaximumHP == 0 )
+        {
+            unsigned int uNewMaxHP = info->stInfo.uVIT * 10;
+            info->stInfo.uCurrentHP = uNewMaxHP;
+            info->stInfo.uMaximumHP = uNewMaxHP;
+        }
+        else
+        {
+            double dRatio = ( double )info->stInfo.uCurrentHP / ( double )info->stInfo.uMaximumHP;
+            unsigned int uNewMaxHP = info->stInfo.uVIT * 10;
+
+            double dNewHP = uNewMaxHP * dRatio;
+
+            info->stInfo.uCurrentHP = dNewHP;
+            info->stInfo.uMaximumHP = uNewMaxHP;
+        }
+    }
+}
+
+void cCharacterModule::RefreshSP( const QString& sUUID )
+{
+    stOFCharacter* info = GetCharacter( sUUID );
+
+    if( info != NULLPTR )
+    {
+        if( info->stInfo.uCurrentSP == 0 && info->stInfo.uMaximumSP )
+        {
+            unsigned int uNewMaxSP = info->stInfo.uINT * 10;
+            info->stInfo.uCurrentSP = uNewMaxSP;
+            info->stInfo.uMaximumSP = uNewMaxSP;
+        }
+        else
+        {
+            double dRatio = ( double )info->stInfo.uCurrentSP / ( double )info->stInfo.uMaximumSP;
+            unsigned int uNewMaxSP = info->stInfo.uINT * 10;
+
+            double dNewSP = uNewMaxSP * dRatio;
+
+            info->stInfo.uCurrentSP = dNewSP;
+            info->stInfo.uMaximumSP = uNewMaxSP;
+        }
+    }
 }
 
 bool cCharacterModule::moduleInit()

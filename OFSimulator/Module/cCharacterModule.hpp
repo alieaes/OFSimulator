@@ -30,6 +30,9 @@ public:
 
     bool                                     IsExistCharacter( const QString& sUUID );
 
+    void                                     RefreshHP( const QString& sUUID );
+    void                                     RefreshSP( const QString& sUUID );
+
 protected:
     bool                                     moduleInit() override;
     bool                                     moduleStart() override;
