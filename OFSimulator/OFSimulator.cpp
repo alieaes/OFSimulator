@@ -8,6 +8,7 @@
 #include "UI/QMakeProfile.hpp"
 //#include "UI/QLoadingPage.hpp"
 
+#include "EXFormat.hpp"
 #include "def/OFCharacter.hpp"
 
 #include "def/OFDefines.hpp"
@@ -79,8 +80,46 @@ void OFSimulator::CharacterViewDoubleClicked( const QListWidgetItem* item )
 
     ui.lblCName->setText( info->stInfo.sFirstName + " " + info->stInfo.sSecondName );
     ui.lblCNickName->setText( info->stInfo.sAlias );
-    ui.lblCGender->setText( "" );
-    EXT_ENUM_GET( eOFGender, info->stInfo.eGender );
+    ui.lblCGender->setText( EXT_ENUM_GET( eOFGender, info->stInfo.eGender ) );
+    ui.lblCAge->setText( Ext::Format::Format( "{} / {}", info->stInfo.rAge, info->stInfo.rLifespan ) );
+    ui.lblCMoney->setText( QString::number( info->stInfo.uMoney ) );
+    ui.lblCHP->setText( Format::Format( "{} / {}", info->stInfo.uCurrentHP, info->stInfo.uMaximumHP ) );
+    ui.lblCSP->setText( Format::Format( "{} / {}", info->stInfo.uCurrentSP, info->stInfo.uMaximumSP ) );
+
+    ui.lblCDamage->setText( QString::number( info->stInfo.uDamage ) );
+    ui.lblCDefence->setText( QString::number( info->stInfo.uDefence ) );
+    ui.lblCOFPower->setText( QString::number( info->stInfo.uOFPower ) );
+    ui.lblCOFPowerDetail->setText( EXT_ENUM_GET( eOFPurity, info->stInfo.ePurity ) );
+
+    ui.lblCSTR->setText( QString::number( info->stInfo.uSTR ) );
+    ui.lblCDEX->setText( QString::number( info->stInfo.uDEX ) );
+    ui.lblCAGI->setText( QString::number( info->stInfo.uAGI ) );
+    ui.lblCMOV->setText( QString::number( info->stInfo.uMOV ) );
+    ui.lblCINT->setText( QString::number( info->stInfo.uINT ) );
+    ui.lblCVIT->setText( QString::number( info->stInfo.uVIT ) );
+    ui.lblCLUK->setText( QString::number( info->stInfo.uLUK ) );
+    ui.lblCWIZ->setText( QString::number( info->stInfo.uWIZ ) );
+    ui.lblCWILL->setText( QString::number( info->stInfo.uWILL ) );
+    ui.lblCCON->setText( QString::number( info->stInfo.uCON ) );
+    ui.lblCCHA->setText( QString::number( info->stInfo.uCHA ) );
+    ui.lblCSIGHT->setText( QString::number( info->stInfo.uSight ) );
+
+    ui.lblCBlade->setText( QString::number( info->stInfo.uBlade ) );
+    ui.lblCSword->setText( QString::number( info->stInfo.uSword ) );
+    ui.lblCSpear->setText( QString::number( info->stInfo.uSpear ) );
+    ui.lblCPole->setText( QString::number( info->stInfo.uPole ) );
+    ui.lblCPalm->setText( QString::number( info->stInfo.uPalm ) );
+    ui.lblCFinger->setText( QString::number( info->stInfo.uFinger ) );
+    ui.lblCFist->setText( QString::number( info->stInfo.uFist ) );
+    ui.lblCProjectile->setText( QString::number( info->stInfo.uProjectile ) );
+
+    ui.lblCFire->setText( QString::number( info->stInfo.uFire ) );
+    ui.lblCWater->setText( QString::number( info->stInfo.uWater ) );
+    ui.lblCIce->setText( QString::number( info->stInfo.uIce ) );
+    ui.lblCElec->setText( QString::number( info->stInfo.uElec ) );
+    ui.lblCPoison->setText( QString::number( info->stInfo.uPoison ) );
+    ui.lblCEarth->setText( QString::number( info->stInfo.uEarth ) );
+    ui.lblCWind->setText( QString::number( info->stInfo.uWind ) );
 }
 
 void OFSimulator::CharacterViewClear()

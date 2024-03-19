@@ -156,6 +156,16 @@ enum eOFPurity
     OF_PURITY_DARK   = 32
 };
 
+EXT_ENUM_START( eOFPurity )
+EXT_ENUM_ADD( OF_PURITY_NONE, "없음" )
+EXT_ENUM_ADD( OF_PURITY_NONE, "평범" )
+EXT_ENUM_ADD( OF_PURITY_NONE, "순수" )
+EXT_ENUM_ADD( OF_PURITY_NONE, "파괴" )
+EXT_ENUM_ADD( OF_PURITY_NONE, "불순" )
+EXT_ENUM_ADD( OF_PURITY_NONE, "오염" )
+EXT_ENUM_ADD( OF_PURITY_NONE, "마공" )
+EXT_ENUM_END( eOFPurity )
+
 struct stDefStatus
 {
     unsigned int              uCurrentHP           = 0;
