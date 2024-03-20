@@ -45,6 +45,8 @@ private:
     XString                                  createFirstName( const eOFGender& eGender );
     XString                                  createSecondName( const eOFGender& eGender );
 
+    void                                     makeCharacterConcept( stOFCharacter& info );
+
 private:
     QReadWriteLock                           _lckCharacter;
 

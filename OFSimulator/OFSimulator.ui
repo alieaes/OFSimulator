@@ -1021,7 +1021,7 @@ QPushButton:pressed
                     <number>0</number>
                    </property>
                    <item>
-                    <widget class="QLabel" name="label_4">
+                    <widget class="QLabel" name="lblWorldTime">
                      <property name="text">
                       <string>TextLabel</string>
                      </property>

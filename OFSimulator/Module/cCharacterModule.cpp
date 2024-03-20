@@ -57,9 +57,10 @@ void cCharacterModule::MakeCharacter()
     info.stInfo.uINT = 10;
     info.stInfo.uVIT = 10;
 
+    _char.insert( info.stInfo.sUUID, info );
+
     RefreshHP( info.stInfo.sUUID );
     RefreshSP( info.stInfo.sUUID );
-    _char.insert( info.stInfo.sUUID, info );
 
     QMetaObject::invokeMethod( _parent->GetCharacter(), "WriteCharacter", Q_ARG( QString, info.stInfo.sUUID.toQString() ) );
 }
@@ -137,7 +138,7 @@ void cCharacterModule::RefreshSP( const QString& sUUID )
 
     if( info != NULLPTR )
     {
-        if( info->stInfo.uCurrentSP == 0 && info->stInfo.uMaximumSP )
+        if( info->stInfo.uCurrentSP == 0 && info->stInfo.uMaximumSP == 0 )
         {
             unsigned int uNewMaxSP = info->stInfo.uINT * 10;
             info->stInfo.uCurrentSP = uNewMaxSP;
@@ -263,4 +264,10 @@ XString cCharacterModule::createSecondName( const eOFGender& eGender )
     auto rand = Ext::Util::cRandom< int >( 0, lstSecondName.size() - 1 );
 
     return lstSecondName[ rand.Generate() ];
+}
+
+void cCharacterModule::makeCharacterConcept( stOFCharacter& info )
+{
+    // 힘캐
+    // 민캐
 }

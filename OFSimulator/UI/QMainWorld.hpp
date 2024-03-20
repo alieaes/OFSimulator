@@ -28,6 +28,8 @@ const int OF_CLAN_MAX          = 100;
 
 const qreal OF_RECT_SIZE             = 60;
 
+class cWorldDateTime;
+
 class QMainWorld : public QWidget
 {
     Q_OBJECT
@@ -72,6 +74,41 @@ private:
     int                                      _moveSpeed;
 
     QPoint                                   _pLastPos;
+
+    stWORLD_INFO                             _worldInfo;
+
+    cWorldDateTime*                          _worldTime = NULLPTR;
+};
+
+
+class cWorldDateTime : public QWidget
+{
+    Q_OBJECT
+
+public:
+    cWorldDateTime( Ui::OFSimulatorClass _ui );
+    ~cWorldDateTime();
+
+    void                                     SpendYear();
+    void                                     SpendMonth();
+    void                                     SpendDay();
+
+    void                                     SpendHour();
+    void                                     SpendMinute();
+    void                                     SpendSecond();
+
+private:
+    void                                     RefreshLabel();
+
+    Ui::OFSimulatorClass                     ui;
+
+    short                                    _rYears      = 0;
+    short                                    _rMonth      = 1;
+    short                                    _rDays       = 1;
+
+    short                                    _rHour       = 0;
+    short                                    _rMinute     = 0;
+    short                                    _rSecond     = 0;
 };
 
 #endif

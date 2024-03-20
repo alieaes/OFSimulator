@@ -73,7 +73,9 @@ struct stWORLD_INFO
 {
     XString                    sWorldName;
 
-    unsigned int               uYears             = 0;
+    short                      rRighteous         = 0;
+    short                      rEvil              = 0;
+    short                      rCult              = 0;
 };
 
 #endif

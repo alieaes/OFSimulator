@@ -6,6 +6,9 @@
 #include "def/OFCharacter.hpp"
 #include "Module/cCharacterModule.hpp"
 #include "Module/EXModuleManager.hpp"
+
+#include "String/EXFormat.hpp"
+
 #include "Util/EXUtil.hpp"
 
 QMainWorld::QMainWorld( QWidget* parent, Ui::OFSimulatorClass _ui )
@@ -129,6 +132,9 @@ void QMainWorld::Init()
     qDebug() << "width=" << _scene->width() << "|height=" << _scene->height();
     qDebug() << "width=" << nRectXCount * OF_RECT_SIZE << "|height=" << nRectYCount * OF_RECT_SIZE;
     qDebug() << "width=" << nWriteX << "|height=" << nWriteY;
+
+    _worldInfo.sWorldName = ui.edtProfileWorldName->text();
+    _worldTime = new cWorldDateTime( ui );
 
     //QGraphicsEllipseItem* dot = scene->addEllipse( 0, 0, 5, 5, QPen(), QBrush( Qt::red ) );
     //dot->setPos( 0, 0 ); // Position of the dot
@@ -1265,6 +1271,112 @@ eTiles QMainWorld::getRecommendTile( eTiles eTile, QPoint pCurrent, QPoint pMax,
     }
 
     return ret;
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+cWorldDateTime::cWorldDateTime( Ui::OFSimulatorClass _ui )
+    : ui( _ui )
+{
+    RefreshLabel();
+}
+
+cWorldDateTime::~cWorldDateTime()
+{
+}
+
+void cWorldDateTime::SpendYear()
+{
+    _rYears++;
+
+    _rMonth = 1;
+    _rDays = 1;
+    _rHour = 0;
+    _rMinute = 0;
+    _rSecond = 0;
+
+    RefreshLabel();
+}
+
+void cWorldDateTime::SpendMonth()
+{
+    _rMonth++;
+
+    if( _rMonth == 12 )
+    {
+        _rMonth = 1;
+        SpendYear();
+    }
+    else
+    {
+        RefreshLabel();
+    }
+}
+
+void cWorldDateTime::SpendDay()
+{
+    _rDays++;
+
+    if( _rDays == 30 )
+    {
+        _rDays = 1;
+        SpendMonth();
+    }
+    else
+    {
+        RefreshLabel();
+    }
+}
+
+void cWorldDateTime::SpendHour()
+{
+    _rHour++;
+
+    if( _rHour == 24 )
+    {
+        _rHour = 0;
+        SpendDay();
+    }
+    else
+    {
+        RefreshLabel();
+    }
+}
+
+void cWorldDateTime::SpendMinute()
+{
+    _rMinute++;
+
+    if( _rMinute == 60 )
+    {
+        _rMinute = 0;
+        SpendHour();
+    }
+    else
+    {
+        RefreshLabel();
+    }
+}
+
+void cWorldDateTime::SpendSecond()
+{
+    _rSecond++;
+
+    if( _rSecond == 60 )
+    {
+        _rSecond = 0;
+        SpendMinute();
+    }
+    else
+    {
+        RefreshLabel();
+    }
+}
+
+void cWorldDateTime::RefreshLabel()
+{
+    QString sWorldTime = Ext::Format::Format( "{}년 {}월 {}일 {}시 {}분 {}초", _rYears, _rMonth, _rDays, _rHour, _rMinute, _rSecond );
+    ui.lblWorldTime->setText( sWorldTime );
 }
 
 /*
