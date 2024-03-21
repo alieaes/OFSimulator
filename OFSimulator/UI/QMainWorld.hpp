@@ -42,6 +42,7 @@ public:
     QSize                                    GetPixmapSize();
     QGraphicsPixmapItem*                     GetPixmap();
     QGraphicsScene*                          GetScene();
+    stWORLD_INFO                             GetWorldInfo();
 
 public slots:
     bool                                     eventFilter( QObject* watched, QEvent* event ) override;

@@ -34,11 +34,9 @@ bool cCharacterModule::Load()
     return isSuccess;
 }
 
-void cCharacterModule::MakeCharacter()
+void cCharacterModule::MakeCharacter( stOFCharacter info, int nX, int nY )
 {
     auto rand = Ext::Util::cRandom< int >( 0, 10000 );
-
-    stOFCharacter info;
 
     info.stInfo.sUUID = Ext::Util::CreateGUID( Ext::CASE_TYPE_UPPER );
 
@@ -62,7 +60,17 @@ void cCharacterModule::MakeCharacter()
     RefreshHP( info.stInfo.sUUID );
     RefreshSP( info.stInfo.sUUID );
 
-    QMetaObject::invokeMethod( _parent->GetCharacter(), "WriteCharacter", Q_ARG( QString, info.stInfo.sUUID.toQString() ) );
+    QMetaObject::invokeMethod( _parent->GetCharacter(), "WriteCharacter", Q_ARG( QString, info.stInfo.sUUID.toQString() ), Q_ARG( int, nX ), Q_ARG( int, nY ) );
+}
+
+void cCharacterModule::MakeCharacter( int nX, int nY )
+{
+    MakeCharacter( stOFCharacter(), nX, nY );
+}
+
+void cCharacterModule::MakeCharacter()
+{
+    MakeCharacter( 0, 0 );
 }
 
 void cCharacterModule::SetCharacterCoord( const QString& sUUID, QPoint pCoord )

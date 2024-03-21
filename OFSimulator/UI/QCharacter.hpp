@@ -19,7 +19,7 @@ public:
     QString                                  MakeComfortableColor();
 
 public slots:
-    Q_INVOKABLE void                         WriteCharacter( QString sUUID );
+    Q_INVOKABLE void                         WriteCharacter( QString sUUID, int nX, int nY );
 
     //bool                                     eventFilter( QObject* watched, QEvent* event ) override;
 

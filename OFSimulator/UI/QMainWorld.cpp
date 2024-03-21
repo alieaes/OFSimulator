@@ -25,13 +25,11 @@ QMainWorld::~QMainWorld()
 
 void QMainWorld::Init()
 {
-    ui.ControlCentor->setCurrentIndex( 3 );
-
     qreal rSceneWidth = ui.gvMap->width() * 4;
-    qreal rSceneHeight = ui.gvMap->height() * 4;
+    qreal rSceneHeight = (double)ui.gvMap->height() * 5.5;
 
     qreal rPixmapWidth = ui.gvMap->width() * 4;
-    qreal rPixmapHeight = ui.gvMap->width() * 4;
+    qreal rPixmapHeight = ui.gvMap->height() * 4;
 
     QGraphicsScene* scene = new QGraphicsScene( this );
     scene->setSceneRect( 0, 0, rSceneWidth, rSceneHeight );
@@ -49,32 +47,36 @@ void QMainWorld::Init()
     ui.gvMap->setRenderHint( QPainter::Antialiasing );
     _scaleFactor = 1.0f;
 
-    QPixmap pixMap( rPixmapWidth, rPixmapHeight );
+    int nRectXCount = rPixmapWidth / OF_RECT_SIZE;
+    int nRectXRemain = ( int )rPixmapWidth % ( int )OF_RECT_SIZE;
+
+    int nRectYCount = rPixmapHeight / OF_RECT_SIZE;
+    int nRectYRemain = ( int )rPixmapHeight % ( int )OF_RECT_SIZE;
+
+    QPixmap pixMap( rPixmapWidth - nRectXRemain, rPixmapHeight - nRectYRemain );
     pixMap.fill( QColor( "#1e1e1e" ) );
+    qreal rect_size = 60; // 네모의 크기
+
+    int nRectFullCount = rPixmapHeight * nRectYCount;
+
     _pixmap = scene->addPixmap( pixMap );
     _pixmap->setPos( 0, 0 );
     //_scene->installEventFilter( this );
     ui.gvMap->update();
-
-    qreal rect_size = 60; // 네모의 크기
-
-    int nRectXCount = _pixmap->pixmap().width() / OF_RECT_SIZE;
-    int nRectYCount = _pixmap->pixmap().height() / OF_RECT_SIZE;
-    int nRectFullCount = nRectXCount * nRectYCount;
 
     _vecTiles = makeMapTiles( nRectXCount, nRectYCount, OF_TILE_ALGORITHM_V1 );
 
     int nWriteX = 0;
     int nWriteY = 0;
 
-    for( int idx = 0; idx < nRectXCount; idx++ )
+    for( int idx = 0; idx < nRectYCount; idx++ )
     {
-        for( int idx2 = 0; idx2 < nRectYCount; idx2++ )
+        for( int idx2 = 0; idx2 < nRectXCount; idx2++ )
         {
             qreal rectX = OF_RECT_SIZE * idx2;
             qreal rectY = OF_RECT_SIZE * idx;
 
-            auto& item = _vecTiles[ idx ][ idx2 ];
+            auto& item = _vecTiles[ idx2 ][ idx ];
             QColor tileColor = getTileColor( item.eTile );
 
             item.pCoord = QPoint( rectX, rectY );
@@ -136,6 +138,10 @@ void QMainWorld::Init()
     _worldInfo.sWorldName = ui.edtProfileWorldName->text();
     _worldTime = new cWorldDateTime( ui );
 
+    _worldInfo.rRighteous = 120;
+    _worldInfo.rEvil      = 60;
+    _worldInfo.rCult      = 20;
+
     //QGraphicsEllipseItem* dot = scene->addEllipse( 0, 0, 5, 5, QPen(), QBrush( Qt::red ) );
     //dot->setPos( 0, 0 ); // Position of the dot
     //dot->setParentItem( _pixmap );
@@ -191,6 +197,11 @@ QGraphicsScene* QMainWorld::GetScene()
     return _scene;
 }
 
+stWORLD_INFO QMainWorld::GetWorldInfo()
+{
+    return _worldInfo;
+}
+
 bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
 {
     QString objName = watched->objectName();
@@ -203,7 +214,7 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
 
         switch( keyEvent->key() )
         {
-            /*
+            
             case Qt::Key_Left:
             case Qt::Key_A:
             _pixmap->moveBy( 100, 0 );
@@ -220,7 +231,7 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
             case Qt::Key_Down:
             _pixmap->moveBy( 0, -100 );
             break;
-            */
+            
             case Qt::Key_Control:
                 {
                 ui.gvMap->setTransformationAnchor( QGraphicsView::AnchorUnderMouse );
@@ -254,6 +265,7 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
         ui.gvMap->setTransformationAnchor( QGraphicsView::AnchorUnderMouse );
 
         double scaleFactor = 0.25;
+        double scaleFactorScroll = 0.5;
 
         double dT = scaleFactor + _scaleFactor;
 
@@ -266,6 +278,9 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
             qDebug() << "Zoom in" << _scaleFactor;
             _pixmap->setScale( _scaleFactor );
 
+            int nCurrentMax = ui.gvMap->verticalScrollBar()->maximum();
+            ui.gvMap->verticalScrollBar()->setMaximum( nCurrentMax + ( nCurrentMax * scaleFactorScroll ) );
+
             return false;
         }
         else
@@ -276,6 +291,9 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
             _scaleFactor -= scaleFactor;
             qDebug() << "Zoom out" << _scaleFactor;
             _pixmap->setScale( _scaleFactor );
+
+            int nCurrentMax = ui.gvMap->verticalScrollBar()->maximum();
+            ui.gvMap->verticalScrollBar()->setMaximum( nCurrentMax - ( nCurrentMax * scaleFactorScroll ) );
 
             return false;
         }

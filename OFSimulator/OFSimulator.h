@@ -24,6 +24,8 @@ public:
     QMainWorld*                               GetWorld() { return _World; }
     QCharacter*                               GetCharacter() { return _Character; }
 
+    void                                      WorldInit();
+
 public slots:
     void                                      on_btnNewGame_clicked();
     void                                      on_btnContinue_clicked();

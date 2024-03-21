@@ -44,9 +44,60 @@ void OFSimulator::CharacterStart()
 {
     if( _Character == NULLPTR )
         _Character = new QCharacter( this, ui );
+}
 
+void OFSimulator::WorldInit()
+{
+    if( _World == NULLPTR || _Character == NULLPTR )
+        return;
+
+    ui.ControlCentor->setCurrentIndex( 3 );
+
+    stWORLD_INFO world = _World->GetWorldInfo();
+    QSize mapSize = _World->GetPixmapSize();
+
+    auto XRandom = Ext::Util::cRandom< int >( 0, mapSize.width() );
+    auto YRandom = Ext::Util::cRandom< int >( 0, mapSize.height() );
+    auto PRandom = Ext::Util::cRandom< int >( 0, 10000 );
     auto spCharacterModule = Module::GetModule< cCharacterModule >( L"CHARACTER" );
-    spCharacterModule->MakeCharacter();
+
+    for( int idx = 0; idx < world.rRighteous; idx++ )
+    {
+        stOFCharacter info;
+
+        int P = PRandom.Generate();
+        if( P < 8000 )
+            info.stInfo.ePurity = OF_PURITY_NORMAL;
+        else if( P >= 8000 && P < 9000 )
+            info.stInfo.ePurity = OF_PURITY_POWER;
+        else if( P >= 9000 )
+            info.stInfo.ePurity = OF_PURITY_PURE;
+
+        spCharacterModule->MakeCharacter( info, XRandom.Generate(), YRandom.Generate() );
+    }
+
+    for( int idx = 0; idx < world.rEvil; idx++ )
+    {
+        stOFCharacter info;
+        
+        int P = PRandom.Generate();
+        if( P < 8000 )
+            info.stInfo.ePurity = OF_PURITY_NORMAL;
+        else if( P >= 8000 && P < 9000 )
+            info.stInfo.ePurity = OF_PURITY_IMPURE;
+        else if( P >= 9000 )
+            info.stInfo.ePurity = OF_PURITY_POWER;
+
+        spCharacterModule->MakeCharacter( info, XRandom.Generate(), YRandom.Generate() );
+    }
+
+    for( int idx = 0; idx < world.rCult; idx++ )
+    {
+        stOFCharacter info;
+
+        info.stInfo.ePurity = OF_PURITY_DARK;
+        spCharacterModule->MakeCharacter( info, XRandom.Generate(), YRandom.Generate() );
+    }
 }
 
 void OFSimulator::on_btnNewGame_clicked()

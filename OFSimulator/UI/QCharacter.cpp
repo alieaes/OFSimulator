@@ -56,12 +56,9 @@ QString QCharacter::MakeComfortableColor()
     return sHexColor;
 }
 
-void QCharacter::WriteCharacter( QString sUUID )
+void QCharacter::WriteCharacter( QString sUUID, int nX, int nY )
 {
     OFSimulator* parent = dynamic_cast< OFSimulator* >( this->parent() );
-
-    int nX = 0;
-    int nY = 0;
 
     QSize characterSize = OF_CHARACTER_LEVEL_1;
 

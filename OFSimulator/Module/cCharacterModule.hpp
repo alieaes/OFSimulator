@@ -21,6 +21,8 @@ public:
     bool                                     Save();
     bool                                     Load();
 
+    void                                     MakeCharacter( stOFCharacter info, int nX, int nY );
+    void                                     MakeCharacter( int nX, int nY );
     void                                     MakeCharacter();
 
     void                                     SetCharacterCoord( const QString& sUUID, QPoint pCoord );

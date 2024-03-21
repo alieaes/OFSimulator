@@ -64,8 +64,14 @@ void QMakeProfile::OnBtnProfileCreateClicked()
 
     auto spCharacter = Module::GetModule< cCharacterModule >( L"CHARACTER" );
 
+    ui.ControlCentor->setCurrentIndex( 1 );
+
+    ui.lblLoadingText->setText( "월드 생성 중" );
     qobject_cast< OFSimulator* >( parent() )->WorldStart();
+    ui.lblLoadingText->setText( "캐릭터 생성 중.." );
     qobject_cast< OFSimulator* >( parent() )->CharacterStart();
+
+    qobject_cast< OFSimulator* >( parent() )->WorldInit();
 }
 
 void QMakeProfile::OnBtnProfileCloseClicked()
