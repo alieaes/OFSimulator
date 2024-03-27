@@ -21,9 +21,112 @@ QMainWorld::QMainWorld( QWidget* parent, Ui::OFSimulatorClass _ui )
 
 QMainWorld::~QMainWorld()
 {
+
 }
 
 void QMainWorld::Init()
+{
+    QColor SCENE_BACKGROUND_COLOR( "#ff9200" );
+    QColor GV_BACKGROUND_COLOR( Qt::black );
+
+    ui.gvMap->setBackgroundBrush( QBrush( GV_BACKGROUND_COLOR ) );
+
+    qDebug() << "gvMap Size : " << ui.gvMap->size();
+
+    QGraphicsScene* scene = new QGraphicsScene( this );
+    scene->setBackgroundBrush( QBrush( SCENE_BACKGROUND_COLOR ) );
+    _scene = scene;
+
+    ui.gvMap->installEventFilter( this );
+    ui.gvMap->setMouseTracking( true );
+
+    ui.gvMap->setScene( scene );
+
+    QPixmap pixMap( 3600, 3600 );
+    _pixmap = scene->addPixmap( pixMap );
+
+    int nRectXCount = 3600 / OF_RECT_SIZE;
+    int nRectXRemain = ( int )2100 % ( int )OF_RECT_SIZE;
+
+    int nRectYCount = 3600 / OF_RECT_SIZE;
+    int nRectYRemain = ( int )2100 % ( int )OF_RECT_SIZE;
+    _vecTiles = makeMapTiles( nRectXCount, nRectYCount, OF_TILE_ALGORITHM_V1 );
+
+    int nWriteX = 0;
+    int nWriteY = 0;
+
+    for( int idx = 0; idx < nRectYCount; idx++ )
+    {
+        for( int idx2 = 0; idx2 < nRectXCount; idx2++ )
+        {
+            qreal rectX = OF_RECT_SIZE * idx2;
+            qreal rectY = OF_RECT_SIZE * idx;
+
+            auto& item = _vecTiles[ idx2 ][ idx ];
+            QColor tileColor = getTileColor( item.eTile );
+
+            item.pCoord = QPoint( rectX, rectY );
+
+            QGraphicsRectItem* rectItem = scene->addRect( rectX, rectY, OF_RECT_SIZE, OF_RECT_SIZE, QPen( Qt::white ), QBrush( tileColor ) );
+
+            nWriteX = rectItem->rect().width();
+            nWriteY = rectItem->rect().height();
+
+            rectItem->setParentItem( _pixmap );
+
+            QVariant var;
+            var.setValue( item );
+            rectItem->setData( OF_MAP_DATA_TILE_INFO, var );
+
+            if( item.eObject == OF_OBJECT_VILLAGE )
+            {
+                QPixmap pix( 32, 32 );
+                pix.load( ":/OFSimulator/res/village.png" );
+
+                QGraphicsPixmapItem* village = scene->addPixmap( pix );
+                village->setScale( 0.5 );
+                village->setPos( rectX + OF_RECT_SIZE / 2 - pix.width() / 4, rectY + OF_RECT_SIZE / 2 - pix.height() / 4 );
+                village->setParentItem( rectItem );
+                village->setZValue( 10 );
+                village->setData( OF_MAP_DATA_PARENT_TILE, true );
+            }
+            else if( item.eObject == OF_OBJECT_HOUSE )
+            {
+                QPixmap pix( 32, 32 );
+                pix.load( ":/OFSimulator/res/house.png" );
+
+                QGraphicsPixmapItem* village = scene->addPixmap( pix );
+                village->setScale( 0.5 );
+                village->setPos( rectX + OF_RECT_SIZE / 2 - pix.width() / 4, rectY + OF_RECT_SIZE / 2 - pix.height() / 4 );
+                village->setParentItem( rectItem );
+                village->setZValue( 10 );
+                village->setData( OF_MAP_DATA_PARENT_TILE, true );
+            }
+            else if( item.eObject == OF_OBJECT_CLAN )
+            {
+                QPixmap pix( 32, 32 );
+                pix.load( ":/OFSimulator/res/banner.png" );
+
+                QGraphicsPixmapItem* village = scene->addPixmap( pix );
+                village->setScale( 0.5 );
+                village->setPos( rectX + OF_RECT_SIZE / 2 - pix.width() / 4, rectY + OF_RECT_SIZE / 2 - pix.height() / 4 );
+                village->setParentItem( rectItem );
+                village->setZValue( 10 );
+                village->setData( OF_MAP_DATA_PARENT_TILE, true );
+            }
+        }
+    }
+
+    _worldInfo.sWorldName = ui.edtProfileWorldName->text();
+    _worldTime = new cWorldDateTime( ui );
+
+    _worldInfo.rRighteous = 120;
+    _worldInfo.rEvil = 60;
+    _worldInfo.rCult = 20;
+
+}
+
+void QMainWorld::InitOld()
 {
     qreal rSceneWidth = ui.gvMap->width() * 4;
     qreal rSceneHeight = (double)ui.gvMap->height() * 5.5;
@@ -214,7 +317,7 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
 
         switch( keyEvent->key() )
         {
-            
+            /*
             case Qt::Key_Left:
             case Qt::Key_A:
             _pixmap->moveBy( 100, 0 );
@@ -231,7 +334,7 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
             case Qt::Key_Down:
             _pixmap->moveBy( 0, -100 );
             break;
-            
+            */
             case Qt::Key_Control:
                 {
                 ui.gvMap->setTransformationAnchor( QGraphicsView::AnchorUnderMouse );
@@ -259,8 +362,13 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
             break;
         }
     }
+    else if( eventType == QEvent::GraphicsSceneDragEnter )
+    {
+        qDebug() << "drag";
+    }
     else if( eventType == QEvent::Wheel )
     {
+        /*
         QWheelEvent* wheelEvent = static_cast< QWheelEvent* >( event );
         ui.gvMap->setTransformationAnchor( QGraphicsView::AnchorUnderMouse );
 
@@ -297,6 +405,7 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
 
             return false;
         }
+        */
     }
     else if( eventType == QEvent::MouseMove )
     {

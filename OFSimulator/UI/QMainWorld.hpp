@@ -38,6 +38,7 @@ public:
     ~QMainWorld();
 
     void                                     Init();
+    void                                     InitOld();
 
     QSize                                    GetPixmapSize();
     QGraphicsPixmapItem*                     GetPixmap();
