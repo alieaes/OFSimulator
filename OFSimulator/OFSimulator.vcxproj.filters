@@ -112,6 +112,9 @@
     <ClCompile Include="..\ExLibs\Util\EXFile.cpp">
       <Filter>Libs\Util</Filter>
     </ClCompile>
+    <ClCompile Include="UI\QGraphicsViewMAP.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ExLibs\Base\ExtConfig.hpp">
@@ -177,6 +180,9 @@
       <Filter>Module</Filter>
     </QtMoc>
     <QtMoc Include="UI\QCharacter.hpp">
+      <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="UI\QGraphicsViewMAP.hpp">
       <Filter>UI</Filter>
     </QtMoc>
   </ItemGroup>

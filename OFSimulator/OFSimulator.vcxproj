@@ -117,6 +117,7 @@
     <ClCompile Include="..\ExLibs\Util\EXFile.cpp" />
     <ClCompile Include="Module\cCharacterModule.cpp" />
     <ClCompile Include="UI\QCharacter.cpp" />
+    <ClCompile Include="UI\QGraphicsViewMAP.cpp" />
     <ClCompile Include="UI\QLoadingPage.cpp" />
     <ClCompile Include="UI\QMainWorld.cpp" />
     <ClCompile Include="UI\QMakeProfile.cpp" />
@@ -133,6 +134,7 @@
     <ClInclude Include="def\OFCharacter.hpp" />
     <ClInclude Include="def\OFDefines.hpp" />
     <ClInclude Include="def\OFWorlds.hpp" />
+    <QtMoc Include="UI\QGraphicsViewMAP.hpp" />
     <QtMoc Include="UI\QCharacter.hpp" />
     <QtMoc Include="UI\QMainWorld.hpp" />
     <QtMoc Include="UI\QMakeProfile.hpp" />

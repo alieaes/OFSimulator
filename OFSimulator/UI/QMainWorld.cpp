@@ -29,15 +29,14 @@ void QMainWorld::Init()
     QColor SCENE_BACKGROUND_COLOR( "#ff9200" );
     QColor GV_BACKGROUND_COLOR( Qt::black );
 
-    ui.gvMap->setBackgroundBrush( QBrush( GV_BACKGROUND_COLOR ) );
-
     qDebug() << "gvMap Size : " << ui.gvMap->size();
 
-    QGraphicsScene* scene = new QGraphicsScene( this );
+    QGraphicsScene* scene = new QGraphicsScene( ui.gvMap );
     scene->setBackgroundBrush( QBrush( SCENE_BACKGROUND_COLOR ) );
     _scene = scene;
+    scene->installEventFilter( this );
 
-    ui.gvMap->installEventFilter( this );
+    //ui.gvMap->installEventFilter( this );
     ui.gvMap->setMouseTracking( true );
 
     ui.gvMap->setScene( scene );
@@ -148,6 +147,8 @@ void QMainWorld::InitOld()
     ui.gvMap->setCacheMode( QGraphicsView::CacheBackground );
     //ui.gvMap->setViewportUpdateMode( QGraphicsView::SmartViewportUpdate );
     ui.gvMap->setRenderHint( QPainter::Antialiasing );
+    ui.gvMap->setTransformationAnchor( QGraphicsView::NoAnchor );
+
     _scaleFactor = 1.0f;
 
     int nRectXCount = rPixmapWidth / OF_RECT_SIZE;
@@ -407,13 +408,102 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
         }
         */
     }
-    else if( eventType == QEvent::MouseMove )
+    else if( event->type() == QEvent::MouseMove || event->type() == QEvent::DragMove )
     {
         QMouseEvent* mouseEvent = static_cast< QMouseEvent* >( event );
         qDebug() << "MOVE";
 
         if( mouseEvent->buttons() == Qt::LeftButton )
         {
+        }
+    }
+    else if( event->type() == QEvent::GraphicsSceneDragMove )
+    {
+        qDebug() << "scene drag move";
+    }
+    else if( event->type() == QEvent::GraphicsSceneHoverMove )
+    {
+        qDebug() << "scene hover move";
+    }
+    else if( event->type() == QEvent::GraphicsSceneMousePress )
+    {
+        QGraphicsSceneMouseEvent* mouseEvent = static_cast< QGraphicsSceneMouseEvent* >( event );
+        _pRightClick = mouseEvent->scenePos();
+
+        if( mouseEvent->button() == Qt::RightButton )
+        {
+            qDebug() << "우클릭" << _pRightClick;
+            _isRightClick = true;
+            ui.gvMap->setDragMode( QGraphicsView::ScrollHandDrag );
+
+        }
+    }
+    else if( event->type() == QEvent::GraphicsSceneMouseRelease )
+    {
+        QGraphicsSceneMouseEvent* mouseEvent = static_cast< QGraphicsSceneMouseEvent* >( event );
+        if( mouseEvent->button() == Qt::RightButton )
+        {
+            qDebug() << "우클릭 해제";
+
+            ui.gvMap->setDragMode( QGraphicsView::NoDrag );
+            _isRightClick = false;
+        }
+    }
+    else if( event->type() == QEvent::GraphicsSceneMouseMove )
+    {
+        QGraphicsSceneMouseEvent* mouseEvent = static_cast< QGraphicsSceneMouseEvent* >( event );
+
+        if( _isRightClick == true )
+        {
+            if( _isRunningEvent == false )
+            {
+                _isRunningEvent = true;
+                //QMutexLocker lck( &_lckRightClick );
+
+                QMouseEvent* pressEvent = new QMouseEvent( QEvent::GraphicsSceneMousePress,
+                                                           mouseEvent->pos(), Qt::MouseButton::LeftButton,
+                                                           Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier );
+
+
+                mousePressEvent( pressEvent );
+
+                qDebug() << "scene mouse move" << mouseEvent->pos() << mouseEvent->scenePos() << mouseEvent->screenPos() << mouseEvent;
+
+
+                /*
+                int nHorizontal = ui.gvMap->horizontalScrollBar()->value();
+                qreal rPosX = mouseEvent->scenePos().x();
+                qreal rRightX = _pRightClick.x();
+
+                int nVertical = ui.gvMap->verticalScrollBar()->value();
+                qreal rPosY = mouseEvent->scenePos().y();
+                qreal rRightY = _pRightClick.y();
+                
+                ui.gvMap->horizontalScrollBar()->removeEventFilter( this );
+                ui.gvMap->verticalScrollBar()->removeEventFilter( this );
+
+                qDebug() << "calc :" << ui.gvMap->horizontalScrollBar()->value() << mouseEvent->scenePos().x() << _pRightClick.x() << ( ui.gvMap->horizontalScrollBar()->value() - ( mouseEvent->scenePos().x() - _pRightClick.x() ) );
+                qDebug() << "calc :" << ui.gvMap->verticalScrollBar()->value() << mouseEvent->scenePos().y() << _pRightClick.y() << ( ui.gvMap->verticalScrollBar()->value() - ( mouseEvent->scenePos().y() - _pRightClick.y() ) );
+
+                QPointF delta = ui.gvMap->mapToScene( mouseEvent->scenePos().toPoint() ) - ui.gvMap->mapToScene( _pRightClick.toPoint() );
+                // modify transform matrix
+                qDebug() << "delta : " << delta;
+                ui.gvMap->translate( 400, delta.y() );
+
+                // force update
+                ui.gvMap->update();
+                */
+                //_scene->removeEventFilter( this );
+                //ui.gvMap->horizontalScrollBar()->setValue( nHorizontal - ( rPosX - rRightX ) );
+                //ui.gvMap->verticalScrollBar()->setValue( nVertical - ( rPosY - rRightY ) );
+                //_scene->installEventFilter( this );
+
+                //_pRightClick = mouseEvent->scenePos();
+                _pRightClick = mouseEvent->scenePos();
+
+                //QTimer::singleShot( 20, this, [this, mouseEvent] { _isRunningEvent = false; } );
+                _isRunningEvent = false;
+            }
         }
     }
     else if( eventType == QEvent::MouseButtonPress )
@@ -510,6 +600,14 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
 
             } while( false );
         }
+        else if( mouseEvent->button() == Qt::RightButton )
+        {
+
+        }
+    }
+    else if( event->type() == QEvent::MouseButtonRelease )
+    {
+
     }
 
     return QWidget::eventFilter( watched, event );

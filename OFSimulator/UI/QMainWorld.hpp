@@ -3,6 +3,7 @@
 #ifndef __HDR_OF_MAIN_WORLD__
 #define __HDR_OF_MAIN_WORLD__
 
+#include "QGraphicsViewMAP.hpp"
 #include "ui_OFSimulator.h"
 
 #include "def/OFWorlds.hpp"
@@ -70,6 +71,7 @@ private:
 
     vec2DTiles                               _vecTiles;
 
+    QGraphicsViewMAP*                        _gvMap;
     QGraphicsScene*                          _scene;
     QGraphicsPixmapItem*                     _pixmap;
     double                                   _scaleFactor;
@@ -80,6 +82,11 @@ private:
     stWORLD_INFO                             _worldInfo;
 
     cWorldDateTime*                          _worldTime = NULLPTR;
+
+    bool                                     _isRightClick = false;
+    QPointF                                  _pRightClick;
+    QMutex                                   _lckRightClick;
+    std::atomic_bool                         _isRunningEvent = false;
 };
 
 

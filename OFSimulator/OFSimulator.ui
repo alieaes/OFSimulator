@@ -1028,7 +1028,7 @@ QPushButton:pressed
                     </widget>
                    </item>
                    <item>
-                    <widget class="QGraphicsView" name="gvMap">
+                    <widget class="QGraphicsViewMAP" name="gvMap">
                      <property name="minimumSize">
                       <size>
                        <width>800</width>
@@ -2852,6 +2852,13 @@ QPushButton:pressed
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QGraphicsViewMAP</class>
+   <extends>QGraphicsView</extends>
+   <header location="global">UI\QGraphicsViewMAP.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="OFSimulator.qrc"/>
  </resources>
