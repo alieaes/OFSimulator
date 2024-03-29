@@ -278,6 +278,36 @@ EXT_ENUM_ADD( OF_GENDER_FEMALE,  "여자" )
 EXT_ENUM_ADD( OF_GENDER_ASEXUAL, "무성" )
 EXT_ENUM_END( eOFGender )
 
+enum eOFBelief
+{
+    OF_BELIEF_NONE          = 0,
+
+    // 무예완성( 武藝完成 )
+    OF_BELIEF_PERFECTION    = 1,
+
+    // 천하제일( 天下第一 )
+    OF_BELIEF_WORLD_OF_BEST = 2,
+
+    // 무사안일( 武士安憩 )
+    OF_BELIEF_SAFE          = 4,
+
+    // 심신수양
+    OF_BELIEF_TRAINING      = 8
+
+    // 천하태평 ( 天下泰平 )
+    
+};
+
+struct stRelationship
+{
+    XString                    sTargetUUID;
+
+    short                      rFriendship          = 0;
+    short                      rLove                = 0;
+};
+
+typedef QVector< stRelationship > vecRelationship;
+
 struct stCharacterInfo : stCharacterHistory, stDefStatus, stInjury, stcharacterAttr, stCharacterQuality, stSecretStatus
 {
     XString                    sUUID;
@@ -292,6 +322,7 @@ struct stCharacterInfo : stCharacterHistory, stDefStatus, stInjury, stcharacterA
     short                      rAge                 = 0;
     short                      rLifespan            = 0;
 
+    vecRelationship            vecRelation;
     vecCharactorHistory        vecHistory;
 
     unsigned int               uMoney               = 0;
@@ -313,6 +344,7 @@ struct stCharacterInfo : stCharacterHistory, stDefStatus, stInjury, stcharacterA
         rAge = 0;
         rLifespan = 0;
 
+        vecRelation.clear();
         vecHistory.clear();
 
         uMoney = 0;
@@ -338,7 +370,7 @@ struct stOFCharacter
     QString                    sColor;
 };
 
-const int OF_CHARACTER_DATA_UUID         = 20000;
+const int OF_CHARACTER_DATA_UUID               = 20000;
 
 const QSize OF_CHARACTER_LEVEL_1               = QSize( 7, 7 );
 const QSize OF_CHARACTER_LEVEL_2               = QSize( 8, 8 );
