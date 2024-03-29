@@ -29,6 +29,7 @@ public:
     void                                     SetCharacterColor( const QString& sUUID, const QString& sColor );
 
     stOFCharacter*                           GetCharacter( const QString& sUUID );
+    OFSimulator*                             GetParent() { return _parent; }
 
     bool                                     IsExistCharacter( const QString& sUUID );
 

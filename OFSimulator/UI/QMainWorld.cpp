@@ -36,23 +36,18 @@ void QMainWorld::Init()
     _scene = scene;
     scene->installEventFilter( this );
 
-    //ui.gvMap->installEventFilter( this );
     ui.gvMap->setMouseTracking( true );
-
+    ui.gvMap->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+    ui.gvMap->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
     ui.gvMap->setScene( scene );
 
-    QPixmap pixMap( 3600, 3600 );
+    QPixmap pixMap( OF_PIXMAP_WIDTH, OF_PIXMAP_HEIGHT );
     _pixmap = scene->addPixmap( pixMap );
 
-    int nRectXCount = 3600 / OF_RECT_SIZE;
-    int nRectXRemain = ( int )2100 % ( int )OF_RECT_SIZE;
+    int nRectXCount = OF_PIXMAP_WIDTH / OF_RECT_SIZE;
+    int nRectYCount = OF_PIXMAP_HEIGHT / OF_RECT_SIZE;
 
-    int nRectYCount = 3600 / OF_RECT_SIZE;
-    int nRectYRemain = ( int )2100 % ( int )OF_RECT_SIZE;
     _vecTiles = makeMapTiles( nRectXCount, nRectYCount, OF_TILE_ALGORITHM_V1 );
-
-    int nWriteX = 0;
-    int nWriteY = 0;
 
     for( int idx = 0; idx < nRectYCount; idx++ )
     {
@@ -67,9 +62,6 @@ void QMainWorld::Init()
             item.pCoord = QPoint( rectX, rectY );
 
             QGraphicsRectItem* rectItem = scene->addRect( rectX, rectY, OF_RECT_SIZE, OF_RECT_SIZE, QPen( Qt::white ), QBrush( tileColor ) );
-
-            nWriteX = rectItem->rect().width();
-            nWriteY = rectItem->rect().height();
 
             rectItem->setParentItem( _pixmap );
 
@@ -122,7 +114,6 @@ void QMainWorld::Init()
     _worldInfo.rRighteous = 120;
     _worldInfo.rEvil = 60;
     _worldInfo.rCult = 20;
-
 }
 
 void QMainWorld::InitOld()
@@ -148,8 +139,6 @@ void QMainWorld::InitOld()
     //ui.gvMap->setViewportUpdateMode( QGraphicsView::SmartViewportUpdate );
     ui.gvMap->setRenderHint( QPainter::Antialiasing );
     ui.gvMap->setTransformationAnchor( QGraphicsView::NoAnchor );
-
-    _scaleFactor = 1.0f;
 
     int nRectXCount = rPixmapWidth / OF_RECT_SIZE;
     int nRectXRemain = ( int )rPixmapWidth % ( int )OF_RECT_SIZE;
@@ -245,41 +234,6 @@ void QMainWorld::InitOld()
     _worldInfo.rRighteous = 120;
     _worldInfo.rEvil      = 60;
     _worldInfo.rCult      = 20;
-
-    //QGraphicsEllipseItem* dot = scene->addEllipse( 0, 0, 5, 5, QPen(), QBrush( Qt::red ) );
-    //dot->setPos( 0, 0 ); // Position of the dot
-    //dot->setParentItem( _pixmap );
-
-    //QGraphicsRectItem* squareDot = scene->addRect( 0, 0, 1000, 1000, QPen(), QBrush( "#1e1e1e" ) );
-    //squareDot->setPos( 10, 10 ); // Position of the square dot
-
-    /*
-    QGraphicsScene* scene = new QGraphicsScene( this );
-    scene->setSceneRect( 0, 0, 1000, 1000 );
-
-    _scene = scene;
-
-    QGraphicsEllipseItem* dot = scene->addEllipse( 0, 0, 5, 5, QPen(), QBrush( Qt::red ) );
-    dot->setPos( 100, 100 ); // Position of the dot
-
-    QGraphicsRectItem* squareDot = scene->addRect( 50, 50, 5, 5, QPen(), QBrush( Qt::blue ) );
-    squareDot->setPos( 100, 100 ); // Position of the square dot
-
-    ui.gvMap->setBackgroundBrush( Qt::yellow );
-    ui.gvMap->setScene( scene );
-
-    ui.gvMap->setViewportUpdateMode( QGraphicsView::BoundingRectViewportUpdate );
-
-
-    ui.gvMap->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-    ui.gvMap->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
-    ui.gvMap->setSceneRect( 0, 0, 1000, 1000 );
-
-    //ui.gvMap->setFocusPolicy( Qt::StrongFocus );
-    ui.gvMap->installEventFilter( this );
-    ui.gvMap->viewport()->setMouseTracking( true );
-    ui.gvMap->viewport()->installEventFilter( this );
-    */
 }
 
 QSize QMainWorld::GetPixmapSize()
@@ -304,6 +258,135 @@ QGraphicsScene* QMainWorld::GetScene()
 stWORLD_INFO QMainWorld::GetWorldInfo()
 {
     return _worldInfo;
+}
+
+void QMainWorld::ShowClickedItem( QMouseEvent* mouseEvent )
+{
+
+    QPoint p = mouseEvent->pos();
+
+    p.setX( p.x() + ui.gvMap->horizontalScrollBar()->value() );
+    p.setY( p.y() + ui.gvMap->verticalScrollBar()->value() );
+
+    //auto mapPoint = ui.gvMap->mapFromScene( mouseEven t->pos() );
+    QGraphicsItem* item = _scene->itemAt( p, _pixmap->sceneTransform() );
+    auto lstItem = _scene->items( p, Qt::IntersectsItemShape, Qt::DescendingOrder, _pixmap->sceneTransform() );
+
+    QGraphicsRectItem* pItem = NULLPTR;
+
+    for( auto* itemTmp : lstItem )
+    {
+        pItem = dynamic_cast< QGraphicsRectItem* >( itemTmp );
+
+        if( pItem != NULLPTR )
+            break;
+    }
+
+    ui.lblMapPoint->setText( QString( "-, -" ) );
+    ui.lblMapTile->setText( QString( "-" ) );
+    ui.lblMapObject->setText( QString( "-" ) );
+    ui.lstCharacter->clear();
+
+    do
+    {
+        if( pItem == NULLPTR )
+        {
+            auto pItemChild = dynamic_cast< QGraphicsPixmapItem* >( item );
+
+            if( pItemChild == NULLPTR )
+            {
+                auto pCharacter = dynamic_cast< QGraphicsEllipseItem* >( item );
+
+                if( pCharacter == NULLPTR )
+                    break;
+            }
+
+            if( pItemChild->data( OF_MAP_DATA_PARENT_TILE ).toBool() == false )
+                break;
+
+            pItem = dynamic_cast< QGraphicsRectItem* >( pItemChild->parentItem() );
+
+            if( pItem == NULLPTR )
+                break;
+        }
+
+        QVariant var = pItem->data( OF_MAP_DATA_TILE_INFO );
+        stOFTileInfo data = var.value<stOFTileInfo>();
+
+        ui.lblMapPoint->setText( QString( "%1, %2" ).arg( data.pCoord.x() ).arg( data.pCoord.y() ) );
+        ui.lblMapTile->setText( QString( "%1" ).arg( getTileName( data.eTile ) ) );
+        ui.lblMapObject->setText( QString( "%1" ).arg( getObjectName( data.eObject ) ) );
+
+        QRect rect( QPoint( data.pCoord.x(), data.pCoord.y() ), QPoint( data.pCoord.x() + OF_RECT_SIZE - 1, data.pCoord.y() + OF_RECT_SIZE - 1 ) );
+        auto lstCharacter = _scene->items( rect, Qt::IntersectsItemShape, Qt::DescendingOrder, _pixmap->sceneTransform() );
+
+        for( auto ofCharacter : lstCharacter )
+        {
+            auto pCharacter = dynamic_cast< QGraphicsEllipseItem* >( ofCharacter );
+
+            if( pCharacter == NULLPTR )
+                continue;
+
+            QString sUUID = ofCharacter->data( OF_CHARACTER_DATA_UUID ).toString();
+
+            if( sUUID.isEmpty() == true )
+                continue;
+
+            auto spCharacterModule = Ext::Module::GetModule< cCharacterModule >( L"CHARACTER" );
+            stOFCharacter* OFCharacter = spCharacterModule->GetCharacter( sUUID );
+
+            if( OFCharacter == NULLPTR )
+                continue;
+
+            QString sName = OFCharacter->stInfo.sFirstName + " " + OFCharacter->stInfo.sSecondName;
+
+            QListWidgetItem* item = new QListWidgetItem( ui.lstCharacter );
+            item->setText( sName );
+            item->setData( OF_CHARACTER_DATA_UUID, sUUID );
+        }
+
+    } while( false );
+}
+
+void QMainWorld::WheelEvent( QWheelEvent* wheelEvent )
+{
+    double scaleFactor = 0.25;
+
+    if( wheelEvent->angleDelta().y() > 0 )
+    {
+        // Zoom in
+        double newScaleFactor = _scaleFactor + scaleFactor;
+        if( newScaleFactor >= 3.0 )
+            return;
+
+        _scaleFactor = newScaleFactor;
+        qDebug() << "Zoom in" << _scaleFactor;
+    }
+    else
+    {
+        // Zoom out
+        double newScaleFactor = _scaleFactor - scaleFactor;
+        if( newScaleFactor < 0.5 )
+            return;
+
+        _scaleFactor = newScaleFactor;
+        qDebug() << "Zoom out" << _scaleFactor;
+    }
+
+    // Scale the pixmap
+    _pixmap->setScale( _scaleFactor );
+
+    int maximumWidth = static_cast< int >( 3600 * _scaleFactor );
+    ui.gvMap->horizontalScrollBar()->setMaximum( maximumWidth );
+
+    int maximumHeight = static_cast< int >( 3600 * _scaleFactor );
+    ui.gvMap->verticalScrollBar()->setMaximum( maximumHeight );
+
+    ui.gvMap->horizontalScrollBar()->setValue( 0 );
+    ui.gvMap->verticalScrollBar()->setValue( 0 );
+
+    QSize scaledSize = _pixmap->boundingRect().size().toSize() * _scaleFactor;
+    ui.gvMap->scene()->setSceneRect( QRectF( QPointF(), scaledSize ) );
 }
 
 bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
@@ -336,14 +419,6 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
             _pixmap->moveBy( 0, -100 );
             break;
             */
-            case Qt::Key_Control:
-                {
-                ui.gvMap->setTransformationAnchor( QGraphicsView::AnchorUnderMouse );
-                ui.gvMap->setDragMode( QGraphicsView::ScrollHandDrag );
-                ui.gvMap->setInteractive( false );
-                ui.gvMap->scene()->update();
-                }
-            break;
             default:
             break;
         }
@@ -351,17 +426,6 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
     else if( eventType == QEvent::KeyRelease )
     {
         QKeyEvent* keyEvent = static_cast< QKeyEvent* >( event );
-
-        switch( keyEvent->key() )
-        {
-            case Qt::Key_Control:
-            ui.gvMap->setDragMode( QGraphicsView::NoDrag );
-            ui.gvMap->setInteractive( true );
-            ui.gvMap->scene()->update();
-            break;
-            default:
-            break;
-        }
     }
     else if( eventType == QEvent::GraphicsSceneDragEnter )
     {
@@ -369,44 +433,6 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
     }
     else if( eventType == QEvent::Wheel )
     {
-        /*
-        QWheelEvent* wheelEvent = static_cast< QWheelEvent* >( event );
-        ui.gvMap->setTransformationAnchor( QGraphicsView::AnchorUnderMouse );
-
-        double scaleFactor = 0.25;
-        double scaleFactorScroll = 0.5;
-
-        double dT = scaleFactor + _scaleFactor;
-
-        if( wheelEvent->angleDelta().y() > 0 )
-        {
-            if( dT >= 3.0f )
-                return false;
-
-            _scaleFactor += scaleFactor;
-            qDebug() << "Zoom in" << _scaleFactor;
-            _pixmap->setScale( _scaleFactor );
-
-            int nCurrentMax = ui.gvMap->verticalScrollBar()->maximum();
-            ui.gvMap->verticalScrollBar()->setMaximum( nCurrentMax + ( nCurrentMax * scaleFactorScroll ) );
-
-            return false;
-        }
-        else
-        {
-            if( dT <= 1.0f )
-                return false;
-
-            _scaleFactor -= scaleFactor;
-            qDebug() << "Zoom out" << _scaleFactor;
-            _pixmap->setScale( _scaleFactor );
-
-            int nCurrentMax = ui.gvMap->verticalScrollBar()->maximum();
-            ui.gvMap->verticalScrollBar()->setMaximum( nCurrentMax - ( nCurrentMax * scaleFactorScroll ) );
-
-            return false;
-        }
-        */
     }
     else if( event->type() == QEvent::MouseMove || event->type() == QEvent::DragMove )
     {
@@ -428,14 +454,8 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
     else if( event->type() == QEvent::GraphicsSceneMousePress )
     {
         QGraphicsSceneMouseEvent* mouseEvent = static_cast< QGraphicsSceneMouseEvent* >( event );
-        _pRightClick = mouseEvent->scenePos();
-
         if( mouseEvent->button() == Qt::RightButton )
         {
-            qDebug() << "우클릭" << _pRightClick;
-            _isRightClick = true;
-            ui.gvMap->setDragMode( QGraphicsView::ScrollHandDrag );
-
         }
     }
     else if( event->type() == QEvent::GraphicsSceneMouseRelease )
@@ -446,65 +466,11 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
             qDebug() << "우클릭 해제";
 
             ui.gvMap->setDragMode( QGraphicsView::NoDrag );
-            _isRightClick = false;
         }
     }
     else if( event->type() == QEvent::GraphicsSceneMouseMove )
     {
         QGraphicsSceneMouseEvent* mouseEvent = static_cast< QGraphicsSceneMouseEvent* >( event );
-
-        if( _isRightClick == true )
-        {
-            if( _isRunningEvent == false )
-            {
-                _isRunningEvent = true;
-                //QMutexLocker lck( &_lckRightClick );
-
-                QMouseEvent* pressEvent = new QMouseEvent( QEvent::GraphicsSceneMousePress,
-                                                           mouseEvent->pos(), Qt::MouseButton::LeftButton,
-                                                           Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier );
-
-
-                mousePressEvent( pressEvent );
-
-                qDebug() << "scene mouse move" << mouseEvent->pos() << mouseEvent->scenePos() << mouseEvent->screenPos() << mouseEvent;
-
-
-                /*
-                int nHorizontal = ui.gvMap->horizontalScrollBar()->value();
-                qreal rPosX = mouseEvent->scenePos().x();
-                qreal rRightX = _pRightClick.x();
-
-                int nVertical = ui.gvMap->verticalScrollBar()->value();
-                qreal rPosY = mouseEvent->scenePos().y();
-                qreal rRightY = _pRightClick.y();
-                
-                ui.gvMap->horizontalScrollBar()->removeEventFilter( this );
-                ui.gvMap->verticalScrollBar()->removeEventFilter( this );
-
-                qDebug() << "calc :" << ui.gvMap->horizontalScrollBar()->value() << mouseEvent->scenePos().x() << _pRightClick.x() << ( ui.gvMap->horizontalScrollBar()->value() - ( mouseEvent->scenePos().x() - _pRightClick.x() ) );
-                qDebug() << "calc :" << ui.gvMap->verticalScrollBar()->value() << mouseEvent->scenePos().y() << _pRightClick.y() << ( ui.gvMap->verticalScrollBar()->value() - ( mouseEvent->scenePos().y() - _pRightClick.y() ) );
-
-                QPointF delta = ui.gvMap->mapToScene( mouseEvent->scenePos().toPoint() ) - ui.gvMap->mapToScene( _pRightClick.toPoint() );
-                // modify transform matrix
-                qDebug() << "delta : " << delta;
-                ui.gvMap->translate( 400, delta.y() );
-
-                // force update
-                ui.gvMap->update();
-                */
-                //_scene->removeEventFilter( this );
-                //ui.gvMap->horizontalScrollBar()->setValue( nHorizontal - ( rPosX - rRightX ) );
-                //ui.gvMap->verticalScrollBar()->setValue( nVertical - ( rPosY - rRightY ) );
-                //_scene->installEventFilter( this );
-
-                //_pRightClick = mouseEvent->scenePos();
-                _pRightClick = mouseEvent->scenePos();
-
-                //QTimer::singleShot( 20, this, [this, mouseEvent] { _isRunningEvent = false; } );
-                _isRunningEvent = false;
-            }
-        }
     }
     else if( eventType == QEvent::MouseButtonPress )
     {
@@ -513,92 +479,6 @@ bool QMainWorld::eventFilter( QObject* watched, QEvent* event )
         if( mouseEvent->button() == Qt::LeftButton )
         {
             qDebug() << "LeftButton clicked";
-
-            qDebug() << "H=" << ui.gvMap->horizontalScrollBar()->value() << "|V=" << ui.gvMap->verticalScrollBar()->value();
-
-            QPoint p = mouseEvent->pos();
-
-            p.setX( p.x() + ui.gvMap->horizontalScrollBar()->value() );
-            p.setY( p.y() + ui.gvMap->verticalScrollBar()->value() );
-
-            //auto mapPoint = ui.gvMap->mapFromScene( mouseEven t->pos() );
-            QGraphicsItem* item = _scene->itemAt( p, _pixmap->sceneTransform() );
-            auto lstItem = _scene->items( p, Qt::IntersectsItemShape, Qt::DescendingOrder, _pixmap->sceneTransform() );
-
-            QGraphicsRectItem* pItem = NULLPTR;
-
-            for( auto* itemTmp : lstItem )
-            {
-                pItem = dynamic_cast< QGraphicsRectItem* >( itemTmp );
-
-                if( pItem != NULLPTR )
-                    break;
-            }
-
-            ui.lblMapPoint->setText( QString( "-, -" ) );
-            ui.lblMapTile->setText( QString( "-" ) );
-            ui.lblMapObject->setText( QString( "-" ) );
-            ui.lstCharacter->clear();
-
-            do
-            {
-                if( pItem == NULLPTR )
-                {
-                    auto pItemChild = dynamic_cast< QGraphicsPixmapItem* >( item );
-
-                    if( pItemChild == NULLPTR )
-                    {
-                        auto pCharacter = dynamic_cast< QGraphicsEllipseItem* >( item );
-
-                        if( pCharacter == NULLPTR )
-                            break;
-                    }
-
-                    if( pItemChild->data( OF_MAP_DATA_PARENT_TILE ).toBool() == false )
-                        break;
-
-                    pItem = dynamic_cast< QGraphicsRectItem* >( pItemChild->parentItem() );
-
-                    if( pItem == NULLPTR )
-                        break;
-                }
-
-                QVariant var = pItem->data( OF_MAP_DATA_TILE_INFO );
-                stOFTileInfo data = var.value<stOFTileInfo>();
-
-                ui.lblMapPoint->setText( QString( "%1, %2" ).arg( data.pCoord.x() ).arg( data.pCoord.y() ) );
-                ui.lblMapTile->setText( QString( "%1" ).arg( getTileName( data.eTile ) ) );
-                ui.lblMapObject->setText( QString( "%1" ).arg( getObjectName( data.eObject ) ) );
-
-                QRect rect( QPoint( data.pCoord.x(), data.pCoord.y() ), QPoint( data.pCoord.x() + OF_RECT_SIZE - 1, data.pCoord.y() + OF_RECT_SIZE - 1) );
-                auto lstCharacter = _scene->items( rect, Qt::IntersectsItemShape, Qt::DescendingOrder, _pixmap->sceneTransform() );
-
-                for( auto ofCharacter : lstCharacter )
-                {
-                    auto pCharacter = dynamic_cast< QGraphicsEllipseItem* >( ofCharacter );
-
-                    if( pCharacter == NULLPTR )
-                        continue;
-
-                    QString sUUID = ofCharacter->data( OF_CHARACTER_DATA_UUID ).toString();
-
-                    if( sUUID.isEmpty() == true )
-                        continue;
-
-                    auto spCharacterModule = Ext::Module::GetModule< cCharacterModule >( L"CHARACTER" );
-                    stOFCharacter* OFCharacter = spCharacterModule->GetCharacter( sUUID );
-
-                    if( OFCharacter == NULLPTR )
-                        continue;
-
-                    QString sName = OFCharacter->stInfo.sFirstName + " " + OFCharacter->stInfo.sSecondName;
-
-                    QListWidgetItem* item = new QListWidgetItem( ui.lstCharacter );
-                    item->setText( sName );
-                    item->setData( OF_CHARACTER_DATA_UUID, sUUID );
-                }
-
-            } while( false );
         }
         else if( mouseEvent->button() == Qt::RightButton )
         {

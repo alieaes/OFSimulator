@@ -2,6 +2,10 @@
 
 #include "UI/QGraphicsViewMAP.hpp"
 
+#include "OFSimulator.h"
+#include "Module/cCharacterModule.hpp"
+#include "Module/EXModuleManager.hpp"
+
 QGraphicsViewMAP::QGraphicsViewMAP( QWidget* parent )
     : QGraphicsView( parent )
 {
@@ -19,16 +23,30 @@ bool QGraphicsViewMAP::eventFilter( QObject* object, QEvent* event )
     if( event->type() == QEvent::MouseButtonPress )
     {
         qDebug() << "MouseButtonPress";
+        QMouseEvent* mouseEvent = static_cast< QMouseEvent* >( event );
 
-        QMouseEvent* mouse_event = static_cast< QMouseEvent* >( event );
-        // Enter here any button you like
-        if( mouse_event->button() == Qt::RightButton )
+        if( mouseEvent->button() == Qt::LeftButton )
+        {
+            QPoint p = mouseEvent->pos();
+
+            p.setX( p.x() + horizontalScrollBar()->value() );
+            p.setY( p.y() + verticalScrollBar()->value() );
+
+            auto spCharacterModule = Ext::Module::GetModule< cCharacterModule >( L"CHARACTER" );
+            OFSimulator* pOF = spCharacterModule->GetParent();
+
+            if( pOF == NULLPTR )
+                return true;
+
+            pOF->GetWorld()->ShowClickedItem( mouseEvent );
+        }
+        else if( mouseEvent->button() == Qt::RightButton )
         {
             // temporarly enable dragging mode
             this->setDragMode( QGraphicsView::DragMode::ScrollHandDrag );
             // emit a left mouse click (the default button for the drag mode)
             QMouseEvent* pressEvent = new QMouseEvent( QEvent::GraphicsSceneMousePress,
-                                                       mouse_event->pos(), Qt::MouseButton::LeftButton,
+                                                       mouseEvent->pos(), Qt::MouseButton::LeftButton,
                                                        Qt::MouseButton::LeftButton, Qt::KeyboardModifier::NoModifier );
 
             this->mousePressEvent( pressEvent );
@@ -44,5 +62,28 @@ bool QGraphicsViewMAP::eventFilter( QObject* object, QEvent* event )
         Q_UNUSED( object );
         return false;
     }
+    else if( event->type() == QEvent::Wheel )
+    {
+        event->ignore();
+        qDebug() << "Wheel";
+        QMouseEvent* mouseEvent = static_cast< QMouseEvent* >( event );
+        return false;
+    }
+
     return QGraphicsView::eventFilter( object, event );
+}
+
+void QGraphicsViewMAP::wheelEvent( QWheelEvent* event )
+{
+    qDebug() << "Wheel2";
+
+    auto spCharacterModule = Ext::Module::GetModule< cCharacterModule >( L"CHARACTER" );
+    OFSimulator* pOF = spCharacterModule->GetParent();
+
+    if( pOF == NULLPTR )
+        return;
+
+    pOF->GetWorld()->WheelEvent( event );
+
+    //QGraphicsView::wheelEvent( event );
 }

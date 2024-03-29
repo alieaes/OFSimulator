@@ -258,7 +258,7 @@ struct stCharacterHistory
 {
     QDateTime                 dtEvent;
     XString                   sEvent;
-    eOFEventLevel             eLevel;
+    eOFEventLevel             eLevel  = OF_EVENT_NORMAL;
 };
 
 typedef QVector< stCharacterHistory > vecCharactorHistory;

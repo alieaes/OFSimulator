@@ -18,16 +18,19 @@ const int OF_MAP_DATA_TILE_INFO          = 10000;
 const int OF_MAP_DATA_OBJECT             = 10001;
 const int OF_MAP_DATA_PARENT_TILE        = 10002;
 
-const int OF_VILLAGE_MIN       = 100;
-const int OF_VILLAGE_MAX       = 80;
+const int OF_VILLAGE_MIN                 = 100;
+const int OF_VILLAGE_MAX                 = 80;
 
-const int OF_HOUSE_MIN         = 400;
-const int OF_HOUSE_MAX         = 300;
+const int OF_HOUSE_MIN                   = 400;
+const int OF_HOUSE_MAX                   = 300;
 
-const int OF_CLAN_MIN          = 150;
-const int OF_CLAN_MAX          = 100;
+const int OF_CLAN_MIN                    = 150;
+const int OF_CLAN_MAX                    = 100;
 
-const qreal OF_RECT_SIZE             = 60;
+const qreal OF_RECT_SIZE                 = 60;
+
+const int OF_PIXMAP_WIDTH                = 3600;
+const int OF_PIXMAP_HEIGHT               = 3600;
 
 class cWorldDateTime;
 
@@ -45,6 +48,9 @@ public:
     QGraphicsPixmapItem*                     GetPixmap();
     QGraphicsScene*                          GetScene();
     stWORLD_INFO                             GetWorldInfo();
+
+    void                                     ShowClickedItem( QMouseEvent* mouseEvent );
+    void                                     WheelEvent( QWheelEvent* wheelEvent );
 
 public slots:
     bool                                     eventFilter( QObject* watched, QEvent* event ) override;
@@ -71,22 +77,17 @@ private:
 
     vec2DTiles                               _vecTiles;
 
-    QGraphicsViewMAP*                        _gvMap;
-    QGraphicsScene*                          _scene;
-    QGraphicsPixmapItem*                     _pixmap;
-    double                                   _scaleFactor;
-    int                                      _moveSpeed;
+    QGraphicsViewMAP*                        _gvMap           = NULLPTR;
+    QGraphicsScene*                          _scene           = NULLPTR;
+    QGraphicsPixmapItem*                     _pixmap          = NULLPTR;
+    double                                   _scaleFactor     = 1.0f;
+    int                                      _moveSpeed       = 0;
 
     QPoint                                   _pLastPos;
 
     stWORLD_INFO                             _worldInfo;
 
-    cWorldDateTime*                          _worldTime = NULLPTR;
-
-    bool                                     _isRightClick = false;
-    QPointF                                  _pRightClick;
-    QMutex                                   _lckRightClick;
-    std::atomic_bool                         _isRunningEvent = false;
+    cWorldDateTime*                          _worldTime       = NULLPTR;
 };
 
 

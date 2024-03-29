@@ -5,6 +5,7 @@
 #include "ui_OFSimulator.h"
 
 #include "Base/ExtConfig.hpp"
+#include "Base/Singleton.hpp"
 
 #include "UI/QCharacter.hpp"
 #include "UI/QMakeProfile.hpp"
