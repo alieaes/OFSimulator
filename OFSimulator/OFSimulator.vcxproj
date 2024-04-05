@@ -116,11 +116,14 @@
     <ClCompile Include="..\ExLibs\String\EXString.cpp" />
     <ClCompile Include="..\ExLibs\Util\EXFile.cpp" />
     <ClCompile Include="Module\cCharacterModule.cpp" />
+    <ClCompile Include="Module\cSimulatorModule.cpp" />
+    <ClCompile Include="Module\cUIManagerModule.cpp" />
     <ClCompile Include="UI\QCharacter.cpp" />
     <ClCompile Include="UI\QGraphicsViewMAP.cpp" />
     <ClCompile Include="UI\QLoadingPage.cpp" />
     <ClCompile Include="UI\QMainWorld.cpp" />
     <ClCompile Include="UI\QMakeProfile.cpp" />
+    <ClCompile Include="UI\QTimeController.cpp" />
     <ClInclude Include="..\ExLibs\Module\EXModuleBase.hpp" />
     <ClInclude Include="..\ExLibs\Module\ExModuleDefines.hpp" />
     <ClInclude Include="..\ExLibs\Module\EXModuleManager.hpp" />
@@ -134,6 +137,7 @@
     <ClInclude Include="def\OFCharacter.hpp" />
     <ClInclude Include="def\OFDefines.hpp" />
     <ClInclude Include="def\OFWorlds.hpp" />
+    <QtMoc Include="UI\QTimeController.hpp" />
     <QtMoc Include="UI\QGraphicsViewMAP.hpp" />
     <QtMoc Include="UI\QCharacter.hpp" />
     <QtMoc Include="UI\QMainWorld.hpp" />
@@ -149,6 +153,8 @@
     <ClInclude Include="..\ExLibs\Base\Singleton.hpp" />
     <ClInclude Include="..\ExLibs\Util\EXUtil.hpp" />
     <QtMoc Include="Module\cCharacterModule.hpp" />
+    <QtMoc Include="Module\cUIManagerModule.hpp" />
+    <QtMoc Include="Module\cSimulatorModule.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">Create</PrecompiledHeader>

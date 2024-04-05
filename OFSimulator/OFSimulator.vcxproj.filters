@@ -115,6 +115,15 @@
     <ClCompile Include="UI\QGraphicsViewMAP.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="Module\cUIManagerModule.cpp">
+      <Filter>Module</Filter>
+    </ClCompile>
+    <ClCompile Include="UI\QTimeController.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Module\cSimulatorModule.cpp">
+      <Filter>Module</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ExLibs\Base\ExtConfig.hpp">
@@ -184,6 +193,15 @@
     </QtMoc>
     <QtMoc Include="UI\QGraphicsViewMAP.hpp">
       <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="Module\cUIManagerModule.hpp">
+      <Filter>Module</Filter>
+    </QtMoc>
+    <QtMoc Include="UI\QTimeController.hpp">
+      <Filter>UI</Filter>
+    </QtMoc>
+    <QtMoc Include="Module\cSimulatorModule.hpp">
+      <Filter>Module</Filter>
     </QtMoc>
   </ItemGroup>
 </Project>
