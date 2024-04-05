@@ -3,7 +3,9 @@
 #include "UI/QGraphicsViewMAP.hpp"
 
 #include "OFSimulator.h"
+#include "def/OFDefines.hpp"
 #include "Module/cCharacterModule.hpp"
+#include "Module/cUIManagerModule.hpp"
 #include "Module/EXModuleManager.hpp"
 
 QGraphicsViewMAP::QGraphicsViewMAP( QWidget* parent )
@@ -32,8 +34,8 @@ bool QGraphicsViewMAP::eventFilter( QObject* object, QEvent* event )
             p.setX( p.x() + horizontalScrollBar()->value() );
             p.setY( p.y() + verticalScrollBar()->value() );
 
-            auto spCharacterModule = Ext::Module::GetModule< cCharacterModule >( L"CHARACTER" );
-            OFSimulator* pOF = spCharacterModule->GetParent();
+            auto spUIManager = Ext::Module::GetModule< cUIManagerModule >( OF_MODULE_UI_MANAGER );
+            OFSimulator* pOF = spUIManager->GetMainWindow();
 
             if( pOF == NULLPTR )
                 return true;
@@ -77,8 +79,8 @@ void QGraphicsViewMAP::wheelEvent( QWheelEvent* event )
 {
     qDebug() << "Wheel2";
 
-    auto spCharacterModule = Ext::Module::GetModule< cCharacterModule >( L"CHARACTER" );
-    OFSimulator* pOF = spCharacterModule->GetParent();
+    auto spUIManager = Ext::Module::GetModule< cUIManagerModule >( OF_MODULE_UI_MANAGER );
+    OFSimulator* pOF = spUIManager->GetMainWindow();
 
     if( pOF == NULLPTR )
         return;
