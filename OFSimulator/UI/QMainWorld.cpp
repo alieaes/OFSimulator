@@ -245,6 +245,18 @@ QSize QMainWorld::GetPixmapSize()
     return size;
 }
 
+QPoint QMainWorld::GetMovealeSize()
+{
+    QPoint p( 0, 0 );
+    if( _pixmap != NULLPTR )
+    {
+        p.setX( _pixmap->pixmap().size().width() - 10 );
+        p.setY( _pixmap->pixmap().size().height() - 10 );
+    }
+
+    return p;
+}
+
 QGraphicsPixmapItem* QMainWorld::GetPixmap()
 {
     return _pixmap;

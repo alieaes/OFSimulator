@@ -45,9 +45,12 @@ public:
     void                                     InitOld();
 
     QSize                                    GetPixmapSize();
+    QPoint                                   GetMovealeSize();
+
     QGraphicsPixmapItem*                     GetPixmap();
     QGraphicsScene*                          GetScene();
     stWORLD_INFO                             GetWorldInfo();
+    cWorldDateTime*                          GetWorldTime() const { return _worldTime; }
 
     void                                     ShowClickedItem( QMouseEvent* mouseEvent );
     void                                     WheelEvent( QWheelEvent* wheelEvent );
