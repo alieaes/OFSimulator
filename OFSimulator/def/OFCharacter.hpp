@@ -254,11 +254,27 @@ enum eOFEventLevel
     OF_EVENT_MYTHIC    = 32,
 };
 
+enum eOFAction
+{
+    OF_ACTION_NONE = 0,
+
+    OF_ACTION_MOVE = 1,
+    OF_ACTION_MUSCLE_TRAINING = 2,
+    OF_ACTION_QI_TRAINNING = 3,
+
+    // 비무?
+    OF_ACTION_SPARRING = 4,
+    OF_ACTION_DUAL = 5,
+
+    OF_ACTION_DIE = 6
+};
+
 struct stCharacterHistory
 {
     QDateTime                 dtEvent;
     XString                   sEvent;
     eOFEventLevel             eLevel  = OF_EVENT_NORMAL;
+    eOFAction                 eAction = OF_ACTION_NONE;
 };
 
 typedef QVector< stCharacterHistory > vecCharactorHistory;
@@ -282,20 +298,26 @@ enum eOFBelief
 {
     OF_BELIEF_NONE          = 0,
 
-    // 무예완성( 武藝完成 )
-    OF_BELIEF_PERFECTION    = 1,
+    // 평범, 그다지 목표가 없음
+    OF_BELIEF_NORMAL        = 1,
 
-    // 천하제일( 天下第一 )
-    OF_BELIEF_WORLD_OF_BEST = 2,
+    // 무예완성( 武藝完成 ), 가진 무예의 완성을 목표로 함.
+    OF_BELIEF_PERFECTION    = 2,
 
-    // 무사안일( 武士安憩 )
-    OF_BELIEF_SAFE          = 4,
+    // 천하제일( 天下第一 ), 천하제일의 자리를 노리기 위해 노력함.
+    OF_BELIEF_WORLD_OF_BEST = 4,
 
-    // 심신수양
-    OF_BELIEF_TRAINING      = 8
+    // 무사안일( 武士安憩 ), 대의보다는 자신의 생명을 우선시함
+    OF_BELIEF_SAFE          = 8,
 
-    // 천하태평 ( 天下泰平 )
-    
+    // 심신수양, 자신을 돌보고 심신수양을 우선으로 함
+    OF_BELIEF_TRAINING      = 16,
+
+    // 천하태평 ( 天下泰平 ), 목표도 없고 유희를 즐김
+    OF_BELIEF_PEACE         = 32,
+
+    // 살육, 목표가 살인
+    OF_BELIEF_SLAY          = 64
 };
 
 struct stRelationship
@@ -318,6 +340,7 @@ struct stCharacterInfo : stCharacterHistory, stDefStatus, stInjury, stcharacterA
     XString                    sAlias;
 
     eOFGender                  eGender              = OF_GENDER_NONE;
+    eOFBelief                  eBelief              = OF_BELIEF_NONE;
 
     short                      rAge                 = 0;
     short                      rLifespan            = 0;
@@ -365,7 +388,7 @@ struct stOFCharacter
 {
     stCharacterInfo            stInfo;
 
-    QPoint                     pCoord = QPoint( 0, 0 );
+    QGraphicsEllipseItem*      gpItem = NULLPTR;
 
     QString                    sColor;
 };
