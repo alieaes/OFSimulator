@@ -25,11 +25,12 @@ public:
     void                                     MakeCharacter( int nX, int nY );
     void                                     MakeCharacter();
 
-    void                                     SetCharacterCoord( const QString& sUUID, QPoint pCoord );
+    void                                     SetCharacterGraphicsItem( const QString& sUUID, QGraphicsEllipseItem* gpItem );
     void                                     SetCharacterColor( const QString& sUUID, const QString& sColor );
 
     stOFCharacter*                           GetCharacter( const QString& sUUID );
     OFSimulator*                             GetParent() { return _parent; }
+    QSet< QString >                          GetAllUUID();
 
     bool                                     IsExistCharacter( const QString& sUUID );
 

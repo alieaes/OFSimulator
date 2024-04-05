@@ -69,6 +69,6 @@ void QCharacter::WriteCharacter( QString sUUID, int nX, int nY )
     ellipseItem->setParentItem( parent->GetWorld()->GetPixmap() );
 
     auto spCharacterModule = Ext::Module::GetModule< cCharacterModule >( L"CHARACTER" );
-    spCharacterModule->SetCharacterCoord( sUUID, QPoint( nX, nY ) );
+    spCharacterModule->SetCharacterGraphicsItem( sUUID, ellipseItem );
     spCharacterModule->SetCharacterColor( sUUID, sColor );
 }

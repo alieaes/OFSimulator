@@ -73,14 +73,14 @@ void cCharacterModule::MakeCharacter()
     MakeCharacter( 0, 0 );
 }
 
-void cCharacterModule::SetCharacterCoord( const QString& sUUID, QPoint pCoord )
+void cCharacterModule::SetCharacterGraphicsItem( const QString& sUUID, QGraphicsEllipseItem* gpItem )
 {
     if( IsExistCharacter( sUUID ) == true )
     {
         stOFCharacter* info = GetCharacter( sUUID );
 
         if( info != NULLPTR )
-            info->pCoord = pCoord;
+            info->gpItem = gpItem;
     }
 }
 
@@ -106,6 +106,18 @@ stOFCharacter* cCharacterModule::GetCharacter( const QString& sUUID )
     }
 
     return info;
+}
+
+QSet< QString > cCharacterModule::GetAllUUID()
+{
+    QSet< QString > setUUID;
+
+    QReadLocker lck( &_lckCharacter );
+
+    for( auto it = _char.keyValueBegin(); it != _char.keyValueEnd(); ++it )
+        setUUID.insert( it->first );
+
+    return setUUID;
 }
 
 bool cCharacterModule::IsExistCharacter( const QString& sUUID )
