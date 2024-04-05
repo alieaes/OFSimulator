@@ -1,9 +1,21 @@
 <RCC>
     <qresource prefix="/OFSimulator">
+        <file>res/imgFastForward.png</file>
+        <file>res/imgFastForward-click.png</file>
+        <file>res/imgFastForward-hover.png</file>
+        <file>res/imgPause.png</file>
+        <file>res/imgPause-click.png</file>
+        <file>res/imgPause-hover.png</file>
+        <file>res/imgStart.png</file>
+        <file>res/imgStart-click.png</file>
+        <file>res/imgStart-hover.png</file>
         <file>res/loading.gif</file>
         <file>res/close.png</file>
         <file>res/house.png</file>
         <file>res/village.png</file>
         <file>res/banner.png</file>
+        <file>res/imgRewind.png</file>
+        <file>res/imgRewind-click.png</file>
+        <file>res/imgRewind-hover.png</file>
     </qresource>
 </RCC>
