@@ -2,8 +2,8 @@
 #include "OFSimulator.h"
 
 #include "Module/EXModuleManager.hpp"
-
 #include "Module/cCharacterModule.hpp"
+#include "Module/cUIManagerModule.hpp"
 
 #include "UI/QMakeProfile.hpp"
 //#include "UI/QLoadingPage.hpp"
@@ -12,19 +12,29 @@
 #include "def/OFCharacter.hpp"
 
 #include "def/OFDefines.hpp"
+#include "UI/QTimeController.hpp"
 
 using namespace Ext;
 
 OFSimulator::OFSimulator( QWidget* parent )
     : QMainWindow( parent )
 {
+    QVariant var( "30.0000" );
+    bool isSuccess = false;
+    int a = var.toInt( &isSuccess );
+
     ui.setupUi( this );
     ui.ControlCentor->setCurrentIndex( 0 );
 
     auto tdModuleManager = Module::tdStModuleManager::GetInstance();
-    tdModuleManager->RegisterModule( L"CHARACTER", L"CHARACTER", new cCharacterModule( this ) );
 
-    auto spCharacterModule = Module::GetModule< cCharacterModule >( L"CHARACTER" );
+    tdModuleManager->RegisterModule( OF_MODULE_CHARACTER, OF_MODULE_CHARACTER, new cCharacterModule( this ) );
+    tdModuleManager->RegisterModule( OF_MODULE_UI_MANAGER, OF_MODULE_UI_MANAGER, new cUIManagerModule( this ) );
+    tdModuleManager->RegisterModule( OF_MODULE_SIMULATOR, OF_MODULE_SIMULATOR, new cUIManagerModule( this ) );
+
+    auto spUIManager = Module::GetModule< cUIManagerModule >( OF_MODULE_UI_MANAGER );
+    spUIManager->SetMainWindow( this );
+    spUIManager->SetTimeController( new QTimeController( this, ui ) );
 
     QObject::connect( ui.lstCharacter, &QListWidget::itemDoubleClicked, this, &OFSimulator::CharacterViewDoubleClicked );
 }
@@ -35,7 +45,12 @@ OFSimulator::~OFSimulator()
 void OFSimulator::WorldStart()
 {
     if( _World == NULLPTR )
+    {
         _World = new QMainWorld( this, ui );
+
+        auto spUIManager = Module::GetModule< cUIManagerModule >( OF_MODULE_UI_MANAGER );
+        spUIManager->SetWorld( _World );
+    }
 
     _World->Init();
 }
@@ -43,7 +58,12 @@ void OFSimulator::WorldStart()
 void OFSimulator::CharacterStart()
 {
     if( _Character == NULLPTR )
+    {
         _Character = new QCharacter( this, ui );
+
+        auto spUIManager = Module::GetModule< cUIManagerModule >( OF_MODULE_UI_MANAGER );
+        spUIManager->SetCharacter( _Character );
+    }
 }
 
 void OFSimulator::WorldInit()
@@ -54,10 +74,10 @@ void OFSimulator::WorldInit()
     ui.ControlCentor->setCurrentIndex( 3 );
 
     stWORLD_INFO world = _World->GetWorldInfo();
-    QSize mapSize = _World->GetPixmapSize();
+    QPoint mapSize = _World->GetMovealeSize();
 
-    auto XRandom = Ext::Util::cRandom< int >( 0, mapSize.width() );
-    auto YRandom = Ext::Util::cRandom< int >( 0, mapSize.height() );
+    auto XRandom = Ext::Util::cRandom< int >( 0, mapSize.x() );
+    auto YRandom = Ext::Util::cRandom< int >( 0, mapSize.y() );
     auto PRandom = Ext::Util::cRandom< int >( 0, 10000 );
     auto spCharacterModule = Module::GetModule< cCharacterModule >( L"CHARACTER" );
 
@@ -103,7 +123,12 @@ void OFSimulator::WorldInit()
 void OFSimulator::on_btnNewGame_clicked()
 {
     if( _QProfile == NULLPTR )
+    {
         _QProfile = new QMakeProfile( this, ui );
+
+        auto spUIManager = Module::GetModule< cUIManagerModule >( OF_MODULE_UI_MANAGER );
+        spUIManager->SetProfilePage( _QProfile );
+    }
 
     _QProfile->Init();
 }
